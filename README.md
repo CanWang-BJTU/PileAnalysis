@@ -1,119 +1,141 @@
-# 基于 m 法的桩基分析程序介绍
-# 欢迎使用本程序👏
-# 下载链接 : https://www.yunpan.com/surl_yNkjFKKBVwU （提取码：9e6b）
+# 基于 m 法的桩基分析程序
+
+欢迎使用本程序！👋 本软件旨在为工程人员提供便捷、可视化的桩基分析工具。
+
+> **下载地址**
+>
+> * **链接**: https://www.yunpan.com/surl_yNkjFKKBVwU
+> * **提取码**: `9e6b`
+
+---
 
 ## 1. 主界面介绍
 
-<img src="https://github.com/user-attachments/assets/9cdc17c6-612c-4bce-b74c-5f84766fcdc9" width="80%" />
+<img src="https://github.com/user-attachments/assets/9cdc17c6-612c-4bce-b74c-5f84766fcdc9" width="100%" />
 
-打开主界面后，界面主要分为两个区域：
-* **左侧**：计算结果展示和可视化展示区域。
-* **右侧**：模式选择和参数输入区。
+打开软件后，主界面布局逻辑清晰，主要分为两个区域：
+* **左侧：可视化与结果区**
+    * 负责展示计算结果的数据摘要。
+    * 提供交互式的可视化绘图展示。
+* **右侧：控制与输入区**
+    * 负责工况模式的选择。
+    * 提供参数输入的交互界面。
+
+---
 
 ## 2. 工况选择
 
-<img width="1326" height="242" alt="image" src="https://github.com/user-attachments/assets/252099d9-50a0-4986-bc8d-4e7c096f7a5f" />
+<img src="https://github.com/user-attachments/assets/252099d9-50a0-4986-bc8d-4e7c096f7a5f" width="80%" />
 
+本程序提供两种工况建立模式，满足不同场景需求：
+1.  **从现有工况计算**：适用于已有 `.dat` 数据文件的情况，支持快速导入复算。
+2.  **新建工况**：适用于无 `.dat` 文件的情况，从零开始建立模型。
 
-本程序提供两种工况模式：
-1.  **从现有工况计算**：适用于已有 `.dat` 文件的情况。
-2.  **新建工况**：适用于无 `.dat` 文件的情况。
+### 2.1 现有工况计算
 
-### 2.1 现有工况计算介绍
+点击右侧的 **【现有工况】** 按钮，界面将跳转至计算菜单：
 
-点击【现有工况】后，右侧将跳转至现有工况计算菜单界面：
+<img src="https://github.com/user-attachments/assets/fd518fde-33d7-4d78-96ff-9a635d34cc7a" width="80%" />
 
-<img width="1332" height="300" alt="image" src="https://github.com/user-attachments/assets/fd518fde-33d7-4d78-96ff-9a635d34cc7a" />
+接下来点击 **【导入现有的dat文件】**：
 
-点击【导入现有的dat文件】：
+<img src="https://github.com/user-attachments/assets/a0c8de3b-d08a-4aa3-96ba-39747a38d9bf" width="80%" />
 
-<img width="1332" height="472" alt="image" src="https://github.com/user-attachments/assets/a0c8de3b-d08a-4aa3-96ba-39747a38d9bf" />
+**智能化导入逻辑：**
+程序会自动解析 `.dat` 文件，识别计算模式及相关参数，并自动勾选对应的分析模式。通常情况下，点击 **【直接计算】** 即可完成分析与可视化。
 
-这样程序会自动识别已有dat文件的的计算模式，以及相关参数，自动勾选相对应的模式，点击直接计算就可以进行相关分析和可视化。
+> **注意：特殊模式说明**
+> * 用户也可手动切换模式。
+> * **模式 2（反算）**：需手动点击【查看与计算】，输入承台中心位移参数。
+> * **模式 4（单桩刚度计算）**：选择该模式后会自动弹出桩位布置界面，用户需手动指定计算的桩号。
 
-另外用户可以手动点击模式，切换到需要的模式。（注：【模式2：反算】，需要手动点击查看与计算，输入承台中心位移参数，点击【模式4：单桩刚度计算】，会自动弹出桩位布置界面，用户需要手动选择计算的桩号）
+**参数修改：**
+若需微调参数，点击 **【查看与修改】** 按钮，即可弹出详细参数编辑页面：
 
-若参数需要修改，我们点击【查看与修改】按钮，弹出详细的参数修改页面：
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/bd7de3dc-478e-4f8c-bbc1-58b394ee1557" width="45%" />
+  <img src="https://github.com/user-attachments/assets/c1834674-6238-421c-be27-23924b25496b" width="45%" />
+</p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/cb259433-36a0-4560-9a26-5cfc94eb348d" width="60%" />
+</p>
 
-<img width="1352" height="1056" alt="image" src="https://github.com/user-attachments/assets/bd7de3dc-478e-4f8c-bbc1-58b394ee1557" />
+**帮助系统：**
+* **即时提示**：点击参数旁的 **【？】** 按钮，可查看该参数的推荐取值与物理含义。
+* **完整文档**：点击菜单栏 **【帮助】**，可查看所有参数的汇总说明。
 
-<img width="1368" height="1038" alt="image" src="https://github.com/user-attachments/assets/c1834674-6238-421c-be27-23924b25496b" />
+<img src="https://github.com/user-attachments/assets/9faeca78-f57e-463e-ae66-37e5e36134c2" width="60%" />
 
-<img width="1336" height="948" alt="image" src="https://github.com/user-attachments/assets/cb259433-36a0-4560-9a26-5cfc94eb348d" />
+**保存功能：**
+编辑完成后，点击 **【保存并导出】** 即可生成新的 `.dat` 工况文件。
 
-关于各个参数此处不过多赘述，点击相关参数旁边【 ？】按钮，则可以弹出相关参数的参考值与介绍。
+### 2.2 新建工况
 
-特别的，点击菜单栏【帮助】按钮，这里汇总了所有参数的参考值与介绍
+<img src="https://github.com/user-attachments/assets/933ed0c9-a2fd-48b1-b076-af03b3b4bc17" width="60%" />
 
-<img width="1674" height="1234" alt="image" src="https://github.com/user-attachments/assets/9faeca78-f57e-463e-ae66-37e5e36134c2" />
+新建工况的操作逻辑与“现有工况”类似。用户需先选择计算模式，随后程序会弹出对应的参数输入界面。输入完成后，同样支持保存为工况文件。
 
-
-本程序还提供保存导出工况功能，点击【保存并导出】就可以导出已经编辑好了的工况.dat文件
-
-### 2.2 新建工况介绍
-
-新建工况整体同现有工况，操作逻辑为先选择模式，弹出对应参数输入界面，输入界面与「现有工况」模式一致，同样提供保存新建工况功能。
-
-<img width="1346" height="1418" alt="image" src="https://github.com/user-attachments/assets/933ed0c9-a2fd-48b1-b076-af03b3b4bc17" />
+---
 
 ## 3. 各个模式介绍
 
-详细见仓库中的example，此处不过多赘述
+本程序包含多种计算模式（如正算、反算、刚度计算等）。
+* 详细的模式说明与输入输出示例，请参阅仓库中的 `example` 文件夹。
 
-## 4.绘图区域介绍
+---
 
-### 4.1 原理图
+## 4. 绘图区域介绍
 
-<img width="1664" height="1080" alt="image" src="https://github.com/user-attachments/assets/19dee094-bf79-4b41-8180-fec057f57e7b" />
+### 4.1 原理图展示
 
-再未开始计算的时候展示原理图，方便用户快速了解各个输入参数，输入顺序。
+<img src="https://github.com/user-attachments/assets/19dee094-bf79-4b41-8180-fec057f57e7b" width="80%" />
 
-### 4.2 计算完成后的可视化
+在未开始计算前，绘图区展示计算原理图，帮助用户快速理解参数含义及输入顺序。
+
+### 4.2 计算结果可视化
 
 #### 4.2.1 模式一和模式二
+提供全方位的可视化支持，包括：
+* 3D 桩位布置图
+* 2D 平面载荷图
+* **各桩桩身响应图**
 
-模式一和模式二提供3D桩布位置图，2D平面载荷图，各桩桩身响应图
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/edddc3c0-0f6f-49d3-a2c7-ad84b60e0ebf" width="32%" />
+  <img src="https://github.com/user-attachments/assets/c379b833-2cfd-4ac9-9d94-6c2db76b018d" width="32%" />
+  <img src="https://github.com/user-attachments/assets/0840a568-1e10-42f0-ab7e-de66d20b7dbd" width="32%" />
+</p>
 
-<img width="1606" height="990" alt="image" src="https://github.com/user-attachments/assets/edddc3c0-0f6f-49d3-a2c7-ad84b60e0ebf" />
-
-<img width="1612" height="994" alt="image" src="https://github.com/user-attachments/assets/c379b833-2cfd-4ac9-9d94-6c2db76b018d" />
-
-<img width="1626" height="1002" alt="image" src="https://github.com/user-attachments/assets/0840a568-1e10-42f0-ab7e-de66d20b7dbd" />
-
-其中桩身响应图明确指出最不利桩，每根桩的最大位移，轴力，弯矩及其位置。
-
-用户可以使用toolbar中的导出功能，实行多种格式的图片输出，适应多种类二次开发和加工。
+**关键特性：**
+* **智能识别最不利桩**：桩身响应图明确标注出最不利桩的位置。
+* **关键指标展示**：直观展示最大位移、轴力、弯矩及其发生位置。
+* **多格式导出**：通过 Toolbar 工具栏，支持导出多种格式的图片，方便二次开发或撰写报告。
 
 #### 4.2.2 模式三和模式四
+* 提供 3D 桩位布置图及 2D 平面图。
+* 相关展示交互功能同上。
 
-模式三和模式四只提供3D桩布位置图，2D平面图，相关展示同4.2.1
+---
 
-## 5.结果输出区介绍
+## 5. 结果输出区介绍
 
-<img width="1652" height="120" alt="image" src="https://github.com/user-attachments/assets/c0a231c9-e458-4338-9383-235ed3435108" />
+<img src="https://github.com/user-attachments/assets/c0a231c9-e458-4338-9383-235ed3435108" width="80%" />
 
-提供结果摘要和原始结果。详细的各个模式结果输出介绍见仓库中example
+计算完成后，界面左侧提供**结果摘要**和**原始结果**预览。
+* 更详细的输出格式说明，请参考 `example` 文件夹。
 
-## 6.特色功能
+---
 
-<img width="562" height="276" alt="image" src="https://github.com/user-attachments/assets/85b07561-253e-41e8-a208-063dcfa1cc4a" />
+## 6. 特色功能：一键导出
 
-点击菜单栏中【导出】按钮，支持一键导出【结果摘要.txt】，【原始输出.txt】,【所有图片】,【刚度矩阵.csv】
+<img src="https://github.com/user-attachments/assets/85b07561-253e-41e8-a208-063dcfa1cc4a" width="40%" />
 
-特别的【刚度矩阵.csv】中既有z轴向下的刚度矩阵，也有z轴向上的刚度矩阵，方便与sap2000等商业软件交互。
+点击菜单栏中的 **【导出】** 按钮，支持一键生成以下文件：
 
+* `结果摘要.txt`
+* `原始输出.txt`
+* `所有可视化图片` (批量导出)
+*  **`刚度矩阵.csv`**
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+> **刚度矩阵特别说明**
+> 导出的 `.csv` 文件中包含 **z 轴向下** 和 **z 轴向上** 两种坐标系下的刚度矩阵，可直接用于与 **SAP2000** 等商业结构分析软件进行交互对接，极大提升工作效率。
