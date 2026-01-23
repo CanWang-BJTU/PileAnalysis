@@ -2,13 +2,6 @@
 
 欢迎使用本程序！👋 本软件旨在为工程人员提供便捷、可视化的桩基分析工具。
 
-> **下载地址**
->
-> * **链接**: [https://www.yunpan.com/surl_yNkjFKKBVwU](https://www.yunpan.com/surl_yNk4d5BixTc )
-> * **提取码**: `c143`
-
----
-
 ## 1. 主界面介绍
 
 <img src="https://github.com/user-attachments/assets/9cdc17c6-612c-4bce-b74c-5f84766fcdc9" width="100%" />
