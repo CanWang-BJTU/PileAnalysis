@@ -247,7 +247,7 @@ Different from Mode 1, which calculates the **global stiffness matrix of the who
 </p>
 
 <p align="center">
-  <b>Fig. 2. Selecting Pile No. 2 for single pile stiffness analysis.</b>
+  <b>Fig. 1. Selecting Pile No. 2 for single pile stiffness analysis.</b>
 </p>
 
 ---
@@ -363,7 +363,7 @@ The 3D view shows the overall pile group and cap geometry, while the plan view s
   </tr>
 </table>
 
-The **Pile Response** tab allows users to inspect the response of each pile. For each pile, ***PileAnalysis*** can display displacement, axial force, and bending moment distributions along the pile depth.
+The **Pile Response** tab allows users to inspect the response of each pile. For each pile, ***PileAnalysis*** can display displacement, axial force, and bending moment distributions along the pile depth. The program can also automatically identify the **critical pile** for each response type, helping users quickly locate the most unfavorable pile response in the pile group.
 
 <table>
   <tr>
@@ -449,41 +449,280 @@ This example is built into ***PileAnalysis*** as the first PILE manual example. 
 After the example is loaded, the program automatically fills in the load input, pile definition, pile arrangement, and soil parameters. Users can then run the analysis and inspect the results following the workflow described above.
 ## Tutorial 4: Nonlinear Axially Loaded Pile Analysis
 
-<!-- 
-This tutorial introduces the axially loaded pile analysis mode in the nonlinear framework.
 
-Suggested contents:
-- Purpose of this mode
-- Soil material definition
-- *t-z* spring model
-- *q-z* spring model
-- Pile definition
-- Axial load input
-- Result visualization
-- Spring parameter export
-- Example screenshots
--->
+
+### 4.1 Interface Overview
+
+Tutorials 4-6 introduce the **single-pile loading analysis functions** in the nonlinear pile-soil interaction framework of ***PileAnalysis***. These three tutorials correspond to axial loading, lateral loading, and combined loading, respectively. This tutorial first uses the **axially loaded single pile** case to explain the basic interface and general modeling workflow.
+
+As shown in Fig. 1, the nonlinear analysis interface consists of the **menu bar**, **analysis scope selection area**, **parameter input area**, **visualization area**, **result output area**, and **status bar**. The menu bar provides access to result export, help documentation, built-in examples, navigation, and language switching. The analysis scope selection area is used to choose between **Single Pile Analysis** and **Group Pile Analysis**. For single-pile analysis, users can further select **Axial Analysis**, **Lateral Analysis**, or **Combined Analysis**.
+
+The parameter input area contains four main tabs: **Soil Material**, **Soil Layers**, **Pile Definition**, and **Load Input**. These tabs are shared by the single-pile loading cases in Tutorials 4-6, while the specific load components and response outputs change according to the selected analysis type. The visualization area displays the soil layer column, 3D pile-soil model, and response curves after calculation. The result output area provides both summary information and detailed data tables.
+
+<p align="center">
+  <img src="figs/example4/interface.png" width="95%" />
+</p>
+
+<p align="center">
+  <b>Fig. 1. Main interface for nonlinear single-pile loading analysis.</b>
+</p>
 
 ---
 
+### 4.2 Example Description
+
+This example demonstrates the **axial loading case** of the nonlinear single-pile analysis module. The pile is embedded in a two-layer soil profile and subjected to an axial load at the pile head. The nonlinear axial pile-soil interaction is modeled through axial soil springs, including shaft resistance and end-bearing resistance.
+
+The purpose of this example is to show the basic workflow for a single-pile loading analysis, including soil material definition, soil layer assignment, pile section definition, load input, mesh control, result visualization, and data export. The lateral and combined loading cases in Tutorials 5 and 6 follow the same general workflow, but use different load components and response outputs.
+
+---
+
+### 4.3 Soil Material Definition
+
+The first step is to define the soil materials. In this example, two soil materials are used: one clay layer and one sand layer.
+
+For the first material, the soil model is set to **API Clay**. The input parameters include unit weight, undrained shear strength, remolded shear strength, maximum unit skin friction, maximum unit end-bearing resistance, and layer color. Users can add or delete soil materials as needed and fill in the corresponding parameters according to the prompts provided in the interface.
+
+<p align="center">
+  <img src="figs/example4/soil%20material.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Fig. 2. Soil material definition for API clay.</b>
+</p>
+
+The nonlinear framework also provides parameter help buttons beside the corresponding input fields. Users can quickly check the applicable model, parameter meaning, typical value range, and input guidance during modeling.
+
+<p align="center">
+  <img src="figs/example4/help%20button.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Fig. 3. Local parameter help for soil material input.</b>
+</p>
+
+In addition, a summarized soil material help window is provided. It collects the reference information for axial and lateral soil models, including API sand, API clay, drilled sand, drilled clay, and elastic models.
+
+<p align="center">
+  <img src="figs/example4/help%20summary.png" width="80%" />
+</p>
+
+<p align="center">
+  <b>Fig. 4. Summary help window for soil material models.</b>
+</p>
+
+---
+
+### 4.4 Soil Layer Definition
+
+After defining the soil materials, the next step is to assign them to soil layers. Soil layer depths are referenced to the ground line, and negative values indicate downward depth.
+
+In this example, the soil profile contains two layers:
+
+| Layer | Top z (-m) | Bottom z (-m) | Soil Material |
+|---|---:|---:|---|
+| 1 | 0.0000 | -10.0000 | Material-1 |
+| 2 | -10.0000 | -20.0000 | Material-2 |
+
+<p align="center">
+  <img src="figs/example4/soil%20layer.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Fig. 5. Soil layer definition for the axial loading example.</b>
+</p>
+
+The soil layer column and the 3D pile-soil view are updated according to the layer definition, helping users check whether the soil profile and pile position are reasonable.
+
+---
+
+### 4.5 Pile Definition
+
+The **Pile Definition** tab is used to define the pile section and pile geometry. In this example, the pile is modeled with an elastic pipe section. The pile diameter is `0.5000 m`, the wall thickness is `0.0200 m`, and the elastic modulus is defined by the user. The pile extends from the ground surface to a depth of `17.0000 m`.
+
+<p align="center">
+  <img src="figs/example4/pile%20definition.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Fig. 6. Pile section and geometry definition.</b>
+</p>
+
+Besides elastic sections, ***PileAnalysis*** also supports nonlinear fiber-section input. Fiber-section modeling allows users to consider material nonlinearity of the pile section. This function is introduced in detail in **Tutorial 8: Nonlinear Fiber Section Import**, so it is not expanded here.
+
+---
+
+### 4.6 Load Input and Mesh Control
+
+The **Load Input** tab defines the external axial load and the finite element mesh settings. In this example, an axial force of `-100 kN` is applied at the pile head. The sign convention follows the global Z axis: downward compression is negative, and upward tension is positive.
+
+<p align="center">
+  <img src="figs/example4/load%20input.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Fig. 7. Axial load input and mesh control.</b>
+</p>
+
+Users can also customize the finite element mesh. The program supports different mesh control methods, including **element number**, **element length**, and **user-defined mesh**. In this example, the advanced mesh setting is enabled, and the mesh is controlled by element number.
+
+After the soil material, soil layers, pile definition, and axial load input are completed, the single-pile axial analysis can be performed.
+
+---
+
+### 4.7 Result Visualization
+
+After the calculation is completed, the **Response** tab displays the nonlinear analysis results. For this axial loading example, the main response curves include vertical displacement and axial force along the pile depth.
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="figs/example4/disp.png" width="100%" />
+      <br>
+      <b>Fig. 8. Vertical displacement distribution.</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="figs/example4/axial%20force.png" width="100%" />
+      <br>
+      <b>Fig. 9. Axial force distribution.</b>
+    </td>
+  </tr>
+</table>
+
+The detailed numerical results are also displayed in the **Data Table** tab. The table includes depth, vertical displacement, axial force, skin friction, ultimate skin resistance, and soil stiffness.
+
+<p align="center">
+  <img src="figs/example4/data%20table.png" width="80%" />
+</p>
+
+<p align="center">
+  <b>Fig. 10. Data table of axial pile response.</b>
+</p>
+
+---
+
+### 4.8 Result Export
+
+The nonlinear framework provides several export options, including result summary export, data table export, response chart export, and spring parameter export.
+
+<p align="center">
+  <img src="figs/example4/export.png" width="55%" />
+</p>
+
+<p align="center">
+  <b>Fig. 11. Export options in the nonlinear framework.</b>
+</p>
+
+For this example, the response data table can be exported to Excel for further post-processing or report preparation.
+
+<p align="center">
+  <img src="figs/example4/export%20xls.png" width="80%" />
+</p>
+
+<p align="center">
+  <b>Fig. 12. Exported response data table.</b>
+</p>
+
+The program can also export nonlinear spring parameters. This function is especially useful when users need to inspect or reuse generated *t-z*, *q-z*, or *p-y* spring data. The spring parameter export workflow is introduced in detail in **Tutorial 7: Nonlinear Pile Group Analysis**, so only the export entry is mentioned here.
+
+---
+
+### 4.9 Loading This Tutorial Example
+
+This example is built into ***PileAnalysis*** as the axial nonlinear tutorial case. Users can load it directly from the menu bar by selecting:
+
+**Examples → Axial Tutorial**
+
+After the example is loaded, the program automatically fills in the soil materials, soil layers, pile definition, and axial load input. Users can then run the analysis and inspect the results following the workflow described above.
 ## Tutorial 5: Nonlinear Laterally Loaded Pile Analysis
 
-<!-- 
-This tutorial introduces the laterally loaded pile analysis mode in the nonlinear framework.
 
-Suggested contents:
-- Purpose of this mode
-- Soil material definition
-- *p-y* spring model
-- Pile definition
-- Lateral load input
-- Result visualization
-- *p-y* curve output
-- Example screenshots
--->
+### 5.1 Example Description
+
+This tutorial demonstrates the **lateral loading case** of the nonlinear single-pile analysis module. The overall modeling workflow is the same as Tutorial 4, including soil material definition, soil layer assignment, pile definition, load input, analysis, visualization, and result export.
+
+The main difference is that this example focuses on the nonlinear lateral pile-soil interaction. The pile is subjected to a horizontal force and bending moment at the pile head, and the program calculates the lateral displacement, rotation, shear force, bending moment, soil reaction, and soil stiffness along the pile depth.
+
+In this example, the soil profile contains two layers. The upper layer uses a soft clay model, and the lower layer uses a sand model. The pile is modeled as an elastic pipe section with a diameter of `0.5 m`, wall thickness of `0.02 m`, and total length of `19 m`.
+
+The soil and pile input process is similar to Tutorial 4 and is not repeated here. The following sections mainly focus on the load input and lateral response visualization.
 
 ---
 
+### 5.2 Load Input
+
+For lateral analysis, the load input is different from the axial loading case. In this example, one lateral load case is applied at the pile head. The horizontal force is applied in the X direction, and a bending moment is applied about the Y axis.
+
+The load components are:
+
+| Load Case | Z (m) | Fx (kN) | Fy (kN) | Mx (kN·m) | My (kN·m) |
+|---|---:|---:|---:|---:|---:|
+| Case 1 | 0.000 | 50.000 | 0.000 | 0.000 | 100.000 |
+
+<p align="center">
+  <img src="figs/example5/load%20input.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Fig. 1. Load input for the nonlinear lateral loading example.</b>
+</p>
+
+---
+
+### 5.3 Result Visualization
+
+After the calculation is completed, the **Response** tab displays the lateral response results. Compared with the axial case in Tutorial 4, the lateral analysis provides more response components, including lateral displacement, rotation, shear force, bending moment, soil reaction, and soil stiffness.
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="figs/example5/disp%20x.png" width="100%" />
+      <br>
+      <b>Fig. 2. Lateral displacement X.</b>
+    </td>
+    <td align="center" width="33%">
+      <img src="figs/example5/Rot%20Y.png" width="100%" />
+      <br>
+      <b>Fig. 3. Rotation about Y.</b>
+    </td>
+    <td align="center" width="33%">
+      <img src="figs/example5/shear%20x.png" width="100%" />
+      <br>
+      <b>Fig. 4. Shear force X.</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <img src="figs/example5/moment%20x.png" width="100%" />
+      <br>
+      <b>Fig. 5. Bending moment X.</b>
+    </td>
+    <td align="center" width="33%">
+      <img src="figs/example5/Soil%20Rxn.png" width="100%" />
+      <br>
+      <b>Fig. 6. Soil reaction.</b>
+    </td>
+    <td align="center" width="33%">
+      <img src="figs/example5/Soil%20K.png" width="100%" />
+      <br>
+      <b>Fig. 7. Soil stiffness.</b>
+    </td>
+  </tr>
+</table>
+
+These plots allow users to inspect the lateral pile response along the depth and identify the critical deformation and internal-force regions. The soil reaction and soil stiffness curves are especially useful for checking the nonlinear *p-y* spring behavior generated by the program.
+
+The result export workflow is the same as Tutorial 4. Users can export the result summary, data table, response charts, and spring parameters from the **Export** menu. The detailed spring parameter export workflow is introduced in Tutorial 7.
+
+---
+
+### 5.4 Loading This Tutorial Example
+
+This example is built into ***PileAnalysis*** as the lateral nonlinear tutorial case. Users can load it directly from the menu bar by selecting:
+
+**Examples → Lateral Tutorial**
+
+After the example is loaded, the program automatically fills in the soil materials, soil layers, pile definition, and lateral load input. Users can then run the analysis and inspect the results following the workflow described above.
 ## Tutorial 6: Nonlinear Combined Loading Analysis
 
 <!-- 
