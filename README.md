@@ -234,39 +234,219 @@ After the example is loaded, the program automatically fills in the pile definit
 
 ## Tutorial 2: M-method Single Pile Stiffness Analysis
 
-<!-- 
-This tutorial introduces the single pile stiffness calculation mode in the m-method framework.
+### 2.1 Example Description
 
-Suggested contents:
-- Purpose of this mode
-- How to select the target pile
-- Required input parameters
-- Step-by-step operation
-- Result visualization
-- Single pile stiffness matrix export
-- Example screenshots
--->
+This tutorial demonstrates **Mode 2: Single Pile Stiffness** in the m-method framework of ***PileAnalysis***.
+
+The example scenario is the same as that used in Tutorial 1. The foundation consists of two vertical circular piles arranged symmetrically along the Y direction. Both piles use the same pile type and the same soil-layer parameters.
+
+Different from Mode 1, which calculates the **global stiffness matrix of the whole pile group foundation**, Mode 2 focuses on the stiffness of a **specified single pile**. In this tutorial, **Pile No. 2** is selected as the target pile, and the program calculates the stiffness matrix corresponding to this selected pile.
+
+<p align="center">
+  <img src="figs/example2/m_method_pile_arrangement2.png" width="80%" />
+</p>
+
+<p align="center">
+  <b>Fig. 2. Selecting Pile No. 2 for single pile stiffness analysis.</b>
+</p>
 
 ---
+
+### 2.2 Calculation Workflow
+
+The overall calculation workflow of this tutorial is basically the same as Tutorial 1. Users still need to define the pile type, pile material parameters, embedded soil-layer parameters, pile-tip parameters, and pile coordinates.
+
+The only additional step is to specify the target pile number in the pile arrangement interface. In this example, **Pile No. 2** is selected. After the target pile is selected, the analysis can be performed directly.
+
+For Mode 2, no external load input is required. The purpose of this mode is to obtain the equivalent stiffness of the selected pile rather than to calculate the response under a specific load case.
+
+---
+
+### 2.3 Visualization and Result Export
+
+The visualization process is the same as that in Tutorial 1. After the calculation is completed, users can view the 3D layout and plan layout to check the pile position and pile numbering.
+
+The result output and export process are also similar to Tutorial 1. The difference is that the exported stiffness matrix corresponds to **Pile No. 2**, rather than the global cap stiffness matrix of the whole pile group.
+
+Therefore, this tutorial is not repeated in detail. Users can follow the same visualization and export procedure introduced in Tutorial 1, while noting that the result in this case represents the **single pile stiffness matrix of Pile No. 2**.
+
+This example is also built into ***PileAnalysis***. Users can load it directly from the menu bar by selecting **Examples → Mode 2 Example: Single Pile Stiffness**.
 
 ## Tutorial 3: M-method Back-Analysis
 
-<!-- 
-This tutorial introduces the back-analysis mode in the m-method framework.
+### 3.1 Example Description
 
-Suggested contents:
-- Purpose of this mode
-- Load input
-- Load application point definition
-- Pile definition
-- Pile arrangement
-- Result visualization
-- Response curve export
-- Example screenshots
--->
+This tutorial demonstrates **Mode 3: Back Analysis** in the m-method framework of ***PileAnalysis***. The example corresponds to **Example 1 in the PILE manual case series**, and is also used as a reference example in the related paper.
+
+Different from Mode 1 and Mode 2, which focus on stiffness calculation, Mode 3 is used to calculate the pile foundation response under specified external loads. The program can output pile-head displacement, pile-head internal forces, and response distributions along each pile, including displacement, axial force, and bending moment.
+
+In this example, the foundation consists of **12 piles** arranged in a rectangular pile group. Two load points are applied on the pile cap. Each load point contains horizontal forces, vertical force, and bending moments. The pile group response is calculated under the simultaneous action of the two load points.
+
+<p align="center">
+  <img src="figs/example3/exanple3%20des.png" width="85%" />
+</p>
+
+<p align="center">
+  <b>Fig. 1. Schematic of the PILE manual Example 1 used in this tutorial.</b>
+</p>
 
 ---
 
+### 3.2 Load Input
+
+For Mode 3, external loads must be defined before running the analysis. This example uses **multiple loads acting simultaneously**. Two load points are applied on the pile cap, located at `(-3.0, 0.0)` and `(3.0, 0.0)`.
+
+For each load point, the applied load components are:
+
+| Load Point | X (m) | Y (m) | Nx (kN) | Ny (kN) | Nz (kN) | Mx (kN·m) | My (kN·m) | Mz (kN·m) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Load 1 | -3.0 | 0.0 | 50.0 | 200.0 | 8000.0 | 2000.0 | 500.0 | 0.0 |
+| Load 2 | 3.0 | 0.0 | 50.0 | 200.0 | 8000.0 | 2000.0 | 500.0 | 0.0 |
+
+<p align="center">
+  <img src="figs/example3/load%20input.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Fig. 2. Multiple load input for the back-analysis example.</b>
+</p>
+
+---
+
+### 3.3 Pile Definition with Two-Section Geometry
+
+After defining the load cases, the next step is to define the pile type and pile-soil parameters.
+
+The main feature of this example is that each pile is defined with **two different pile diameters along the depth**. The upper section has a diameter of `1.5 m`, while the lower section has a diameter of `1.0 m`. This setting is used to model a stepped pile geometry, where the pile cross-section changes along the embedded depth.
+
+In the pile definition interface, the above-ground segment is defined first. In this example, the free segment length is `2.0 m`, the diameter is `1.5 m`, and the subdivision count is `2`.
+
+The embedded segment is then divided into two layers:
+
+| Segment | Layer Thickness H (m) | Diameter D (m) | m Value (kN/m^4) | Internal Friction Angle φ | Subdivision Count N |
+|---|---:|---:|---:|---:|---:|
+| 1 | 10.0 | 1.5 | 1000.0 | 20.0 | 10 |
+| 2 | 9.0 | 1.0 | 1000.0 | 20.0 | 9 |
+
+The pile tip is modeled as a bored friction pile, and the pile-tip foundation coefficient is defined at the bottom of the input page.
+
+<p align="center">
+  <img src="figs/example3/pile%20definition.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Fig. 3. Pile definition with two-section pile geometry.</b>
+</p>
+
+Other pile material, soil parameter, and pile arrangement operations are similar to those introduced in Tutorial 1 and are not repeated here.
+
+---
+
+### 3.4 Visualization and Result Interpretation
+
+After the load input, pile definition, and pile arrangement are completed, the analysis can be performed. The program provides 3D layout, plan layout, and pile response visualization.
+
+The 3D view shows the overall pile group and cap geometry, while the plan view shows the pile numbering, pile locations, and the applied load points.
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="figs/example3/3D%20view.png" width="100%" />
+      <br>
+      <b>Fig. 4. 3D layout of the 12-pile foundation.</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="figs/example3/plan%20view.png" width="100%" />
+      <br>
+      <b>Fig. 5. Plan layout and load positions.</b>
+    </td>
+  </tr>
+</table>
+
+The **Pile Response** tab allows users to inspect the response of each pile. For each pile, ***PileAnalysis*** can display displacement, axial force, and bending moment distributions along the pile depth.
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="figs/example3/displament.png" width="100%" />
+      <br>
+      <b>Fig. 6. Displacement distribution.</b>
+    </td>
+    <td align="center" width="33%">
+      <img src="figs/example3/Axial%20force.png" width="100%" />
+      <br>
+      <b>Fig. 7. Axial force distribution.</b>
+    </td>
+    <td align="center" width="33%">
+      <img src="figs/example3/moment.png" width="100%" />
+      <br>
+      <b>Fig. 8. Bending moment distribution.</b>
+    </td>
+  </tr>
+</table>
+
+The result summary lists the pile-head displacement and pile-head internal forces for each pile.
+
+<p align="center">
+  <img src="figs/example3/summary.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Fig. 9. Summary output of the back-analysis example.</b>
+</p>
+
+---
+
+### 3.5 CSV Result Export
+
+For Mode 3, the exported CSV results contain more response information than the stiffness modes. The main exported tables include:
+
+- input load information;
+- cap-center displacement;
+- pile-head displacement summary;
+- pile-head internal force summary;
+- detailed pile-head response data.
+
+The summary CSV records the load cases, cap-center displacement, and overall analysis information. The other exported tables provide pile-level response data for subsequent comparison, post-processing, or report preparation.
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="figs/example3/CSV1.png" width="100%" />
+      <br>
+      <b>Fig. 10. Analysis summary and input load information.</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="figs/example3/CSV2.png" width="100%" />
+      <br>
+      <b>Fig. 11. Pile-head displacement summary.</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="figs/example3/CSV3.png" width="100%" />
+      <br>
+      <b>Fig. 12. Pile-head internal force summary.</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="figs/example3/CSV4.png" width="100%" />
+      <br>
+      <b>Fig. 13. Detailed pile-head response data.</b>
+    </td>
+  </tr>
+</table>
+
+Other visualization and export operations are similar to those described in Tutorial 1 and are not repeated here.
+
+---
+
+### 3.6 Loading This Tutorial Example
+
+This example is built into ***PileAnalysis*** as the first PILE manual example. Users can load it directly from the menu bar by selecting:
+
+**Examples → PILE Manual Examples → Example 1**
+
+After the example is loaded, the program automatically fills in the load input, pile definition, pile arrangement, and soil parameters. Users can then run the analysis and inspect the results following the workflow described above.
 ## Tutorial 4: Nonlinear Axially Loaded Pile Analysis
 
 <!-- 
