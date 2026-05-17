@@ -50,19 +50,34 @@ Users can click the following links to jump directly to each tutorial:
 
 ## Tutorial 1: M-method Pile Group Stiffness Analysis
 
-<!-- 
-This tutorial introduces the pile group stiffness calculation mode in the m-method framework.
 
-Suggested contents:
-- Purpose of this mode
-- Required input parameters
-- Step-by-step operation
-- Result visualization
-- Stiffness matrix export
-- Example screenshots
--->
+This tutorial introduces the group pile stiffness calculation mode in the m-method framework of ***PileAnalysis***.
 
----
+Before presenting the detailed operation procedure, the main interface of the m-method framework is briefly introduced. As shown in Fig. 1, the interface consists of five main areas: the **menu bar**, **status bar**, **parameter input area**, **visualization area**, and **result output area**.
+
+- **Menu Bar**  
+  The menu bar provides access to the main functions of the program, including example loading, help documentation, result export, and other auxiliary tools.
+
+- **Status Bar**  
+  The status bar displays the current program status, operation prompts, and analysis progress information.
+
+- **Parameter Input Area**  
+  The parameter input area is used to select the analysis mode, define pile and soil parameters, configure pile arrangement, and control the analysis process.
+
+- **Visualization Area**  
+  The visualization area is used to display the schematic diagram, 3D pile layout, plan view, and other graphical results after calculation.
+
+- **Result Output Area**  
+  The result output area displays the analysis results, including the result summary and the original solver output.
+
+<p align="center">
+  <img src="M-method interface" src="https://github.com/user-attachments/assets/4ee35830-481a-40c7-a1fc-9510eba02166" />
+" width="95%" />
+</p>
+
+<p align="center">
+  <b>Fig. 1. Main interface of the m-method framework.</b>
+</p>
 
 ## Tutorial 2: M-method Single Pile Stiffness Analysis
 
