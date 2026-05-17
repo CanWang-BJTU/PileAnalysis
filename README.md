@@ -19,20 +19,30 @@
    - Supports nonlinear *p-y*, *t-z*, and *q-z* soil spring models.
    - Supports axial, lateral, combined loading, and pile group analyses.
    - Supports interaction with ***SectionMCPy***, allowing users to import nonlinear fiber-section data and account for pile material nonlinearity in pile foundation analysis.
+   - Supports export of generated nonlinear soil spring parameters for subsequent numerical modeling and verification.
 
 ***PileAnalysis*** aims to provide engineers, researchers, and students with a convenient, visual, and extensible tool for pile foundation analysis without requiring complex manual scripting.
 
 ---
+## Soil Model References
 
-## Reference
+[1] Matlock H. Correlations for design of laterally loaded piles in soft clay. Offshore Technology Conference; 1970 Apr 21-23; Houston, Texas. OTC-1204-MS. https://doi.org/10.4043/1204-MS.
 
-<!-- Please add the citation information of the PileAnalysis paper here. -->
+[2] Reese LC, Welch RC. Lateral loading of deep foundations in stiff clay. Journal of the Geotechnical Engineering Division. 1975;101(7):633-49. https://doi.org/10.1061/AJGEB6.0000177.
 
----
+[3] Reese LC, Cox WR, Koop FD. Analysis of laterally loaded piles in sand. Offshore Technology Conference; 1974 May 5-7; Houston, Texas. OTC-2080-MS. https://doi.org/10.4043/2080-MS.
+
+[4] American Petroleum Institute. Recommended practice for planning, designing and constructing fixed offshore platforms: working stress design. API RP 2A-WSD. 22nd ed. Washington, DC: American Petroleum Institute; 2014.
+
+[5] Reese LC, Van Impe WF, Wang ST. Single piles and pile groups under lateral loading. 3rd ed. Boca Raton: CRC Press; 2025.
+
+[6] Rocscience Inc. RSPile Axially Loaded Piles Theory Manual. Toronto: Rocscience Inc.; Available from: https://static.rocscience.cloud/assets/verification-and-theory/RSPile/RSPile-Axially-Loaded-Piles-Theory-Manual.pdf
+
+[7] Rocscience Inc. RSPile Laterally Loaded Piles Theory Manual. Toronto: Rocscience Inc.; Available from: https://static.rocscience.cloud/assets/verification-and-theory/RSPile/RSPile-Laterally-Loaded-Piles-Theory-Manual.pdf
 
 # Tutorial
 
-***PileAnalysis*** provides nine tutorials covering the main functions of the m-method framework, the nonlinear framework, fiber-section import, and result export. All examples mentioned in this section are built into the **Example** menu of the software. Users can load the corresponding parameters into the GUI with a single click, modify them as needed, and then run the analysis based on the predefined example cases.
+***PileAnalysis*** provides eight tutorials covering the main functions of the m-method framework, the nonlinear framework, fiber-section import, and result export. All examples mentioned in this section are built into the **Examples** menu of the software. Users can load the corresponding parameters into the GUI with a single click, modify them as needed, and then run the analysis based on the predefined example cases.
 
 Users can click the following links to jump directly to each tutorial:
 
@@ -138,10 +148,14 @@ After defining the pile type, the next step is to assign pile positions and pile
 
 In this example, the foundation contains two piles. Both piles are assigned to the same pile type. Their coordinates are arranged symmetrically along the Y direction:
 
+<div align="center">
+
 | Pile No. | X Coordinate (m) | Y Coordinate (m) | Pile Type |
 |---|---:|---:|---|
 | 1 | 0.000 | 2.250 | type1 |
 | 2 | 0.000 | -2.250 | type1 |
+
+</div>
 
 The simulated pile option is not enabled in this example. Therefore, the calculated stiffness matrix is contributed only by the two physical piles.
 
@@ -231,6 +245,8 @@ The example shown in this tutorial is built into ***PileAnalysis***. Users can l
 
 After the example is loaded, the program automatically fills in the pile definition, pile arrangement, and soil parameters. Users can then inspect the model, modify the parameters if needed, and run the analysis following the workflow described above.
 
+---
+
 ## Tutorial 2: M-method Single Pile Stiffness Analysis
 
 ### 2.1 Example Description
@@ -271,6 +287,8 @@ Therefore, this tutorial is not repeated in detail. Users can follow the same vi
 
 This example is also built into ***PileAnalysis***. Users can load it directly from the menu bar by selecting **Examples → Mode 2 Example: Single Pile Stiffness**.
 
+---
+
 ## Tutorial 3: M-method Back-Analysis
 
 ### 3.1 Example Description
@@ -282,7 +300,7 @@ Different from Mode 1 and Mode 2, which focus on stiffness calculation, Mode 3 i
 In this example, the foundation consists of **12 piles** arranged in a rectangular pile group. Two load points are applied on the pile cap. Each load point contains horizontal forces, vertical force, and bending moments. The pile group response is calculated under the simultaneous action of the two load points.
 
 <p align="center">
-  <img src="figs/example3/exanple3%20des.png" width="85%" />
+  <img src="figs/example3/exanple3 des.png" width="85%" />
 </p>
 
 <p align="center">
@@ -297,13 +315,17 @@ For Mode 3, external loads must be defined before running the analysis. This exa
 
 For each load point, the applied load components are:
 
+<div align="center">
+
 | Load Point | X (m) | Y (m) | Nx (kN) | Ny (kN) | Nz (kN) | Mx (kN·m) | My (kN·m) | Mz (kN·m) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | Load 1 | -3.0 | 0.0 | 50.0 | 200.0 | 8000.0 | 2000.0 | 500.0 | 0.0 |
 | Load 2 | 3.0 | 0.0 | 50.0 | 200.0 | 8000.0 | 2000.0 | 500.0 | 0.0 |
 
+</div>
+
 <p align="center">
-  <img src="figs/example3/load%20input.png" width="75%" />
+  <img src="figs/example3/load input.png" width="75%" />
 </p>
 
 <p align="center">
@@ -322,15 +344,19 @@ In the pile definition interface, the above-ground segment is defined first. In 
 
 The embedded segment is then divided into two layers:
 
+<div align="center">
+
 | Segment | Layer Thickness H (m) | Diameter D (m) | m Value (kN/m^4) | Internal Friction Angle φ | Subdivision Count N |
 |---|---:|---:|---:|---:|---:|
 | 1 | 10.0 | 1.5 | 1000.0 | 20.0 | 10 |
 | 2 | 9.0 | 1.0 | 1000.0 | 20.0 | 9 |
 
+</div>
+
 The pile tip is modeled as a bored friction pile, and the pile-tip foundation coefficient is defined at the bottom of the input page.
 
 <p align="center">
-  <img src="figs/example3/pile%20definition.png" width="75%" />
+  <img src="figs/example3/pile definition.png" width="75%" />
 </p>
 
 <p align="center">
@@ -347,15 +373,15 @@ After the load input, pile definition, and pile arrangement are completed, the a
 
 The 3D view shows the overall pile group and cap geometry, while the plan view shows the pile numbering, pile locations, and the applied load points.
 
-<table>
+<table align="center">
   <tr>
     <td align="center" width="50%">
-      <img src="figs/example3/3D%20view.png" width="100%" />
+      <img src="figs/example3/3D view.png" width="100%" />
       <br>
       <b>Fig. 4. 3D layout of the 12-pile foundation.</b>
     </td>
     <td align="center" width="50%">
-      <img src="figs/example3/plan%20view.png" width="100%" />
+      <img src="figs/example3/plan view.png" width="100%" />
       <br>
       <b>Fig. 5. Plan layout and load positions.</b>
     </td>
@@ -364,7 +390,7 @@ The 3D view shows the overall pile group and cap geometry, while the plan view s
 
 The **Pile Response** tab allows users to inspect the response of each pile. For each pile, ***PileAnalysis*** can display displacement, axial force, and bending moment distributions along the pile depth. The program can also automatically identify the **critical pile** for each response type, helping users quickly locate the most unfavorable pile response in the pile group.
 
-<table>
+<table align="center">
   <tr>
     <td align="center" width="33%">
       <img src="figs/example3/displament.png" width="100%" />
@@ -372,7 +398,7 @@ The **Pile Response** tab allows users to inspect the response of each pile. For
       <b>Fig. 6. Displacement distribution.</b>
     </td>
     <td align="center" width="33%">
-      <img src="figs/example3/Axial%20force.png" width="100%" />
+      <img src="figs/example3/Axial force.png" width="100%" />
       <br>
       <b>Fig. 7. Axial force distribution.</b>
     </td>
@@ -398,17 +424,9 @@ The result summary lists the pile-head displacement and pile-head internal force
 
 ### 3.5 CSV Result Export
 
-For Mode 3, the exported CSV results contain more response information than the stiffness modes. The main exported tables include:
+For Mode 3, the exported CSV results contain more response information than the stiffness modes. The main exported tables include input load information, cap-center displacement, pile-head displacement summary, pile-head internal force summary, and detailed pile-head response data.
 
-- input load information;
-- cap-center displacement;
-- pile-head displacement summary;
-- pile-head internal force summary;
-- detailed pile-head response data.
-
-The summary CSV records the load cases, cap-center displacement, and overall analysis information. The other exported tables provide pile-level response data for subsequent comparison, post-processing, or report preparation.
-
-<table>
+<table align="center">
   <tr>
     <td align="center" width="50%">
       <img src="figs/example3/CSV1.png" width="100%" />
@@ -446,9 +464,10 @@ This example is built into ***PileAnalysis*** as the first PILE manual example. 
 **Examples → PILE Manual Examples → Example 1**
 
 After the example is loaded, the program automatically fills in the load input, pile definition, pile arrangement, and soil parameters. Users can then run the analysis and inspect the results following the workflow described above.
+
+---
+
 ## Tutorial 4: Nonlinear Axially Loaded Pile Analysis
-
-
 
 ### 4.1 Interface Overview
 
@@ -483,7 +502,7 @@ The first step is to define the soil materials. In this example, two soil materi
 For the first material, the soil model is set to **API Clay**. The input parameters include unit weight, undrained shear strength, remolded shear strength, maximum unit skin friction, maximum unit end-bearing resistance, and layer color. Users can add or delete soil materials as needed and fill in the corresponding parameters according to the prompts provided in the interface.
 
 <p align="center">
-  <img src="figs/example4/soil%20material.png" width="75%" />
+  <img src="figs/example4/soil material.png" width="75%" />
 </p>
 
 <p align="center">
@@ -493,7 +512,7 @@ For the first material, the soil model is set to **API Clay**. The input paramet
 The nonlinear framework also provides parameter help buttons beside the corresponding input fields. Users can quickly check the applicable model, parameter meaning, typical value range, and input guidance during modeling.
 
 <p align="center">
-  <img src="figs/example4/help%20button.png" width="75%" />
+  <img src="figs/example4/help button.png" width="75%" />
 </p>
 
 <p align="center">
@@ -503,7 +522,7 @@ The nonlinear framework also provides parameter help buttons beside the correspo
 In addition, a summarized soil material help window is provided. It collects the reference information for axial and lateral soil models, including API sand, API clay, drilled sand, drilled clay, and elastic models.
 
 <p align="center">
-  <img src="figs/example4/help%20summary.png" width="80%" />
+  <img src="figs/example4/help summary.png" width="80%" />
 </p>
 
 <p align="center">
@@ -518,13 +537,17 @@ After defining the soil materials, the next step is to assign them to soil layer
 
 In this example, the soil profile contains two layers:
 
+<div align="center">
+
 | Layer | Top z (-m) | Bottom z (-m) | Soil Material |
 |---|---:|---:|---|
 | 1 | 0.0000 | -10.0000 | Material-1 |
 | 2 | -10.0000 | -20.0000 | Material-2 |
 
+</div>
+
 <p align="center">
-  <img src="figs/example4/soil%20layer.png" width="75%" />
+  <img src="figs/example4/soil layer.png" width="75%" />
 </p>
 
 <p align="center">
@@ -540,7 +563,7 @@ The soil layer column and the 3D pile-soil view are updated according to the lay
 The **Pile Definition** tab is used to define the pile section and pile geometry. In this example, the pile is modeled with an elastic pipe section. The pile diameter is `0.5000 m`, the wall thickness is `0.0200 m`, and the elastic modulus is defined by the user. The pile extends from the ground surface to a depth of `17.0000 m`.
 
 <p align="center">
-  <img src="figs/example4/pile%20definition.png" width="75%" />
+  <img src="figs/example4/pile definition.png" width="75%" />
 </p>
 
 <p align="center">
@@ -556,7 +579,7 @@ Besides elastic sections, ***PileAnalysis*** also supports nonlinear fiber-secti
 The **Load Input** tab defines the external axial load and the finite element mesh settings. In this example, an axial force of `-100 kN` is applied at the pile head. The sign convention follows the global Z axis: downward compression is negative, and upward tension is positive.
 
 <p align="center">
-  <img src="figs/example4/load%20input.png" width="75%" />
+  <img src="figs/example4/load input.png" width="75%" />
 </p>
 
 <p align="center">
@@ -573,7 +596,7 @@ After the soil material, soil layers, pile definition, and axial load input are 
 
 After the calculation is completed, the **Response** tab displays the nonlinear analysis results. For this axial loading example, the main response curves include vertical displacement and axial force along the pile depth.
 
-<table>
+<table align="center">
   <tr>
     <td align="center" width="50%">
       <img src="figs/example4/disp.png" width="100%" />
@@ -581,7 +604,7 @@ After the calculation is completed, the **Response** tab displays the nonlinear 
       <b>Fig. 8. Vertical displacement distribution.</b>
     </td>
     <td align="center" width="50%">
-      <img src="figs/example4/axial%20force.png" width="100%" />
+      <img src="figs/example4/axial force.png" width="100%" />
       <br>
       <b>Fig. 9. Axial force distribution.</b>
     </td>
@@ -591,7 +614,7 @@ After the calculation is completed, the **Response** tab displays the nonlinear 
 The detailed numerical results are also displayed in the **Data Table** tab. The table includes depth, vertical displacement, axial force, skin friction, ultimate skin resistance, and soil stiffness.
 
 <p align="center">
-  <img src="figs/example4/data%20table.png" width="80%" />
+  <img src="figs/example4/data table.png" width="80%" />
 </p>
 
 <p align="center">
@@ -615,7 +638,7 @@ The nonlinear framework provides several export options, including result summar
 For this example, the response data table can be exported to Excel for further post-processing or report preparation.
 
 <p align="center">
-  <img src="figs/example4/export%20xls.png" width="80%" />
+  <img src="figs/example4/export xls.png" width="80%" />
 </p>
 
 <p align="center">
@@ -633,8 +656,8 @@ This example is built into ***PileAnalysis*** as the axial nonlinear tutorial ca
 **Examples → Axial Tutorial**
 
 After the example is loaded, the program automatically fills in the soil materials, soil layers, pile definition, and axial load input. Users can then run the analysis and inspect the results following the workflow described above.
-## Tutorial 5: Nonlinear Laterally Loaded Pile Analysis
 
+---
 
 ## Tutorial 5: Nonlinear Laterally Loaded Pile Analysis
 
@@ -656,9 +679,13 @@ For lateral analysis, the load input is different from the axial loading case. I
 
 The load components are:
 
+<div align="center">
+
 | Load Case | Z (m) | Fx (kN) | Fy (kN) | Mx (kN·m) | My (kN·m) |
 |---|---:|---:|---:|---:|---:|
 | Case 1 | 0.000 | 50.000 | 0.000 | 0.000 | 100.000 |
+
+</div>
 
 <p align="center">
   <img src="figs/example5/load input.png" width="75%" />
@@ -711,6 +738,9 @@ This example is built into ***PileAnalysis*** as the lateral nonlinear tutorial 
 **Examples → Lateral Tutorial**
 
 After the example is loaded, the program automatically fills in the soil materials, soil layers, pile definition, and lateral load input. Users can then run the analysis and inspect the results following the workflow described above.
+
+---
+
 ## Tutorial 6: Nonlinear Combined Loading Analysis
 
 ### 6.1 Example Description
@@ -747,9 +777,13 @@ The **Load Input** tab contains both axial and lateral load components. In this 
 
 The load components are:
 
+<div align="center">
+
 | Load Case | Z (m) | Fz (kN) | Fx (kN) | Fy (kN) | Mx (kN·m) | My (kN·m) |
 |---|---:|---:|---:|---:|---:|---:|
 | Case 1 | 0.000 | -100.000 | 50.000 | 0.000 | 0.000 | 100.000 |
+
+</div>
 
 <p align="center">
   <img src="figs/example6/load.png" width="75%" />
@@ -788,6 +822,8 @@ This example is built into ***PileAnalysis*** as the combined nonlinear tutorial
 **Examples → Combined Tutorial**
 
 After the example is loaded, the program automatically fills in the soil material, soil layer, pile definition, and combined load input. Users can then run the analysis and inspect the full response results following the workflow described above.
+
+---
 
 ## Tutorial 7: Nonlinear Pile Group Analysis
 
@@ -837,9 +873,13 @@ The **Pile Layout** tab is used to define pile coordinates, pile top and bottom 
 
 The **Load Input** tab is used to define the external load applied to the cap. In this example, one load case is applied at the cap reference point, with a horizontal force and a vertical force.
 
+<div align="center">
+
 | Load Case | X (m) | Y (m) | Nx (kN) | Ny (kN) | Nz (kN) | Mx (kN·m) | My (kN·m) | Mz (kN·m) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | Load 1 | 0.000 | 0.000 | 161.907 | 0.000 | -3736.320 | 0.000 | 0.000 | 0.000 |
+
+</div>
 
 <p align="center">
   <img src="figs/example7/load.png" width="75%" />
@@ -979,35 +1019,95 @@ This example is built into ***PileAnalysis*** as the nonlinear pile group tutori
 
 After the example is loaded, the program automatically fills in the soil materials, soil layers, pile definition, cap definition, pile layout, and load input. Users can then run the analysis and inspect the results following the workflow described above.
 
+---
+
 ## Tutorial 8: Nonlinear Fiber Section Import
 
-<!-- 
-This tutorial introduces how to import nonlinear fiber-section data from ***SectionMCPy***.
+Users can click here to learn more about and download ***SectionMCPy***: [SectionMCPy](https://github.com/Junjun1guo/SectionMCPy).
 
-Suggested contents:
-- Purpose of fiber-section import
-- ***SectionMCPy*** data preparation
-- HDF5 file import
-- Fiber section visualization
-- Connection with nonlinear pile analysis
-- Example screenshots
--->
+### 8.1 Example Description
+
+This tutorial introduces the interaction between ***PileAnalysis*** and ***SectionMCPy***. In the nonlinear framework, users can define the pile section as an **Elastic** section, a **Nonlinear Fiber** section, or use **Comparison** mode to calculate both section models in the same case.
+
+The example uses a circular reinforced-concrete fiber section generated by ***SectionMCPy*** and saved as an HDF5 file. In ***PileAnalysis***, this H5 file can be imported directly in the **Pile Definition** interface. The program automatically parses the section information, fiber mesh, reinforcement layout, and section properties, allowing users to check the imported section visually before running the pile analysis.
+
+This function provides a direct connection between section-level nonlinear fiber modeling and pile foundation analysis.
 
 ---
 
-## Tutorial 9: Export Module and Special Functions
+### 8.2 Fiber Section Import and Mesh Preview
 
-<!-- 
-This tutorial introduces the export module and other special functions of ***PileAnalysis***.
+In the **Pile Definition** tab, users can select **Nonlinear Fiber** as the section model. A new fiber section can then be created and imported from the H5 file exported by ***SectionMCPy***.
 
-Suggested contents:
-- Result summary export
-- Response curve export
-- Stiffness matrix export
-- Soil spring parameter export
-- Node coordinate export
-- Fiber-section data export
-- Batch figure export
-- External finite element software interaction
-- Example screenshots
--->
+After the H5 file is imported, ***PileAnalysis*** automatically reads the fiber-section information and displays it in the interface. The imported section information includes the concrete material, rebar material, stirrup type, fiber count, reinforcement groups, section area, rebar area, and reinforcement ratio.
+
+At the same time, the program provides a **Mesh** preview of the imported section. This preview shows the fiber discretization and reinforcement arrangement, helping users confirm that the SectionMCPy fiber section has been correctly recognized by ***PileAnalysis***.
+
+<p align="center">
+  <img src="figs/example8/interface.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Fig. 1. Imported SectionMCPy fiber section and mesh preview.</b>
+</p>
+
+---
+
+### 8.3 Fiber Point Preview
+In addition to the mesh preview, users can switch to the **Fiber Points** view to inspect the distribution of all fiber points in the imported section. This view helps users verify the concrete fiber points, reinforcement locations, and the overall consistency between the imported H5 data and the original ***SectionMCPy*** section model.
+
+<p align="center">
+  <img src="figs/example8/ fiberpoint.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Fig. 2. Fiber point preview of the imported section.</b>
+</p>
+
+---
+### 8.4 Pile Section Setting
+
+After the fiber section is imported, users need to assign the section to the pile along the pile depth. In the **Pile Section Layout** tab, the imported section can be assigned to one or more pile segments.
+
+In this example, `Section-1` is assigned to the full pile length from `0.0 m` to `17.0 m`. The pile geometry is defined in the same interface, including the pile top elevation, pile bottom elevation, and total pile length.
+
+<p align="center">
+  <img src="figs/example8/section.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Fig. 3. Assigning the imported fiber section to the pile segment.</b>
+</p>
+
+---
+
+### 8.5 Comparison Mode
+
+***PileAnalysis*** also supports **Comparison** mode. In this mode, users can define both an elastic section and a nonlinear fiber section in the same pile model.
+
+The program can calculate the response using both section definitions, allowing users to compare the influence of elastic section assumptions and nonlinear fiber-section behavior. This is useful for evaluating whether pile material nonlinearity has a significant effect on the pile foundation response.
+
+<p align="center">
+  <img src="figs/example8/campare.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Fig. 4. Comparison mode for elastic and nonlinear fiber sections.</b>
+</p>
+
+---
+
+### 8.6 Loading and Using This Example
+
+This example demonstrates the general workflow for importing a ***SectionMCPy*** fiber-section H5 file into ***PileAnalysis***:
+
+1. Prepare the fiber section in ***SectionMCPy*** and export the H5 file.
+2. Open the nonlinear framework in ***PileAnalysis***.
+3. Go to **Pile Definition** and select **Nonlinear Fiber**.
+4. Create a new fiber section and import the H5 file.
+5. Check the imported section information and mesh preview.
+6. Inspect the fiber point distribution if needed.
+7. Assign the imported section to the pile segment.
+8. Run the nonlinear pile analysis.
+
+Through this workflow, users can transfer section-level fiber discretization from ***SectionMCPy*** into pile foundation analysis and consider pile material nonlinearity in ***PileAnalysis***.
