@@ -50,29 +50,29 @@ Users can click the following links to jump directly to each tutorial:
 
 ## Tutorial 1: M-method Pile Group Stiffness Analysis
 
+## Tutorial 1: Group Pile Stiffness
 
 This tutorial introduces the group pile stiffness calculation mode in the m-method framework of ***PileAnalysis***.
 
-Before presenting the detailed operation procedure, the main interface of the m-method framework is briefly introduced. As shown in Fig. 1, the interface consists of five main areas: the **menu bar**, **status bar**, **parameter input area**, **visualization area**, and **result output area**.
+Before presenting the detailed operation procedure, the main interface of the m-method framework is briefly introduced. As shown in Fig. 1, the main interface consists of five main areas: the **menu bar**, **status bar**, **parameter input area**, **visualization area**, and **result output area**.
 
 - **Menu Bar**  
-  The menu bar provides access to the main functions of the program, including example loading, help documentation, result export, and other auxiliary tools.
+  The menu bar provides access to the main functions of the program, including example loading, help documentation, result export, navigation, and language switching.
 
 - **Status Bar**  
-  The status bar displays the current program status, operation prompts, and analysis progress information.
+  The status bar displays the current program status, version information, author information, and operation prompts.
 
 - **Parameter Input Area**  
   The parameter input area is used to select the analysis mode, define pile and soil parameters, configure pile arrangement, and control the analysis process.
 
 - **Visualization Area**  
-  The visualization area is used to display the schematic diagram, 3D pile layout, plan view, and other graphical results after calculation.
+  The visualization area is used to display the analysis schematic, 3D pile layout, plan layout, and other graphical results after calculation.
 
 - **Result Output Area**  
   The result output area displays the analysis results, including the result summary and the original solver output.
 
 <p align="center">
-  <img src="M-method interface" src="https://github.com/user-attachments/assets/4ee35830-481a-40c7-a1fc-9510eba02166" />
-" width="95%" />
+  <img src="figs/example1/m_method_interface.png" width="95%" />
 </p>
 
 <p align="center">
