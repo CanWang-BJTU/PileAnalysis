@@ -332,6 +332,8 @@ For each load point, the applied load components are:
   <b>Fig. 2. Multiple load input for the back-analysis example.</b>
 </p>
 
+**Note:** By default, the program applies the loads to the bottom of the pile cap. If the thickness needs to be considered, the user must manually simplify and transfer the loads.
+
 ---
 
 ### 3.3 Pile Definition with Two-Section Geometry
@@ -345,7 +347,7 @@ In the pile definition interface, the above-ground segment is defined first. In 
 The embedded segment is then divided into two layers:
 
 <div align="center">
-> **Note:** By default, the program applies the loads to the bottom of the pile cap. If the thickness needs to be considered, the user must manually simplify and transfer the loads.
+
 
 | Segment | Layer Thickness H (m) | Diameter D (m) | m Value (kN/m^4) | Internal Friction Angle φ | Subdivision Count N |
 |---|---:|---:|---:|---:|---:|
@@ -891,9 +893,9 @@ The **Load Input** tab is used to define the external load applied to the cap. I
 </p>
 
 Other inputs, including soil layer definition, pile section definition, and mesh control, follow the same logic as the single-pile nonlinear examples and are not repeated here.
+ **P.S.** The load acts at the center of the pile cap thickness.
 
 ---
-> **P.S.** The load acts at the center of the pile cap thickness.
 
 ### 7.3 Result Visualization
 
