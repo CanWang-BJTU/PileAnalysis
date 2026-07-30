@@ -2,8 +2,9 @@
 
 ## Latest Release
 
-[Click here to download ***PileAnalysis*** V3.0](https://github.com/CanWang-BJTU/PileAnalysis/releases/tag/V3.0)
+[Click here to download ***PileAnalysis*** V3.0.1](https://github.com/CanWang-BJTU/PileAnalysis/releases/tag/V3.0.1)
 
+**Updated July 30, 2026:** 
 ---
 
 ***PileAnalysis*** is an open-source Python-based graphical user interface (GUI) program for pile foundation analysis and pile-soil interaction simulation.
@@ -39,6 +40,18 @@
 [6] Rocscience Inc. RSPile Axially Loaded Piles Theory Manual. Toronto: Rocscience Inc.; Available from: https://static.rocscience.cloud/assets/verification-and-theory/RSPile/RSPile-Axially-Loaded-Piles-Theory-Manual.pdf
 
 [7] Rocscience Inc. RSPile Laterally Loaded Piles Theory Manual. Toronto: Rocscience Inc.; Available from: https://static.rocscience.cloud/assets/verification-and-theory/RSPile/RSPile-Laterally-Loaded-Piles-Theory-Manual.pdf
+
+[8] Rocscience Inc. RSPile Group Effect Documentation. Available from: https://www.rocscience.com/help/rspile/documentation/model-definition/group-pile-analysis/group-effect
+
+## Documentation
+
+Click the links below to jump to the technical documentation at the end of this README:
+
+1. [Theoretical Formulation and Computational Implementation](#theoretical-formulation-and-computational-implementation)
+2. [*p*-Multiplier Definition and Application](#p-multiplier-definition-and-application)
+3. [Verification and Validation](#verification-and-validation)
+4. [Computational Performance](#computational-performance)
+5. [Comparison with Representative Pile-Analysis Software](#comparison-with-representative-pile-analysis-software)
 
 # Tutorial
 
@@ -293,7 +306,7 @@ This example is also built into ***PileAnalysis***. Users can load it directly f
 
 ### 3.1 Example Description
 
-This tutorial demonstrates **Mode 3: Back Analysis** in the m-method framework of ***PileAnalysis***. The example corresponds to **Example 1 in the PILE manual case series**, and is also used as a reference example in the related paper.
+This tutorial demonstrates **Mode 3: Load- Response Analysis** in the m-method framework of ***PileAnalysis***. The example corresponds to **Example 1 in the PILE manual case series**, and is also used as a reference example in the related paper.
 
 Different from Mode 1 and Mode 2, which focus on stiffness calculation, Mode 3 is used to calculate the pile foundation response under specified external loads. The program can output pile-head displacement, pile-head internal forces, and response distributions along each pile, including displacement, axial force, and bending moment.
 
@@ -1115,3 +1128,470 @@ This example demonstrates the general workflow for importing a ***SectionMCPy***
 8. Run the nonlinear pile analysis.
 
 Through this workflow, users can transfer section-level fiber discretization from ***SectionMCPy*** into pile foundation analysis and consider pile material nonlinearity in ***PileAnalysis***.
+
+---
+
+# Technical Documentation
+
+## Theoretical Formulation and Computational Implementation
+
+This section summarizes the principal formulations implemented in
+***PileAnalysis***. The software integrates a linear elastic m-method solver and
+a nonlinear Beam-on-Nonlinear Winkler Foundation (BNWF) framework.
+
+### Linear Elastic m-Method
+
+The m-method is a classical linear elastic approach for the static analysis of
+pile foundations. The pile is idealized as an Euler-Bernoulli beam resting on
+an elastic foundation, while the surrounding soil is represented by
+continuously distributed linear springs.
+
+The lateral soil resistance is assumed to be proportional to the lateral pile
+displacement:
+
+$$
+p(z)=m(z)y(z)
+$$
+
+where $p(z)$ is the lateral soil resistance per unit pile length, $y(z)$ is the
+lateral displacement of the pile, and $m(z)$ is the horizontal subgrade
+reaction modulus. For layered soil profiles, different values of $m(z)$ can be
+assigned to the corresponding layers.
+
+Based on Euler-Bernoulli beam theory, the governing differential equation is
+
+$$
+EI\frac{d^4y(z)}{dz^4}+m(z)y(z)=0
+$$
+
+where $E$ is the Young's modulus of the pile material and $I$ is the second
+moment of area of the pile section. The m-method module calculates single-pile
+and pile-group stiffness matrices, pile-head deformation, and internal-force
+distributions. A high-performance Fortran solver is used for these
+calculations.
+
+### Beam-on-Nonlinear Winkler Foundation Framework
+
+The nonlinear module is based on the BNWF approach. The pile is discretized
+using beam-column elements, and the surrounding soil is represented by
+nonlinear springs connected to the pile through zero-length elements.
+According to the selected soil model and loading condition, ***PileAnalysis***
+generates the corresponding *p-y*, *t-z*, and *q-z* backbone curves and
+constructs the finite-element model in ***OpenSeesPy***.
+
+#### Representative *p-y* Formulation
+
+For soft clay, the Matlock model is included as a representative lateral
+spring formulation. The ultimate lateral soil resistance is calculated as
+
+$$
+p_u=\min\left[
+\left(3+\frac{\gamma' z}{c_u}+\frac{Jz}{D}\right)c_uD,\;
+9c_uD
+\right]
+$$
+
+and the reference displacement is
+
+$$
+y_{50}=2.5\varepsilon_{50}D
+$$
+
+The corresponding static backbone curve is
+
+$$
+p=\min\left[
+0.5p_u\left(\frac{y}{y_{50}}\right)^{1/3},\;
+p_u
+\right]
+$$
+
+where $c_u$ is the undrained shear strength, $\gamma'$ is the effective unit
+weight of soil, $D$ is the pile diameter, $J$ is an empirical coefficient, and
+$\varepsilon_{50}$ is the strain corresponding to one-half of the maximum
+principal stress difference in an undrained compression test.
+
+#### Representative *t-z* Formulation
+
+For the API Sand model, the ultimate shaft resistance assigned to an
+individual spring is
+
+$$
+t_u=\tau_u\pi D\Delta L,\qquad
+\tau_u=\min\left(K\sigma'_v\tan\delta,\;f_{\max}\right)
+$$
+
+where $K$ is the lateral earth-pressure coefficient, $\sigma'_v$ is the
+effective vertical stress, $\delta$ is the pile-soil interface friction angle,
+$f_{\max}$ is the limiting unit shaft resistance, and $\Delta L$ is the
+tributary pile length represented by the spring.
+
+The *t-z* relationship is represented by a linear-perfectly-plastic model:
+
+$$
+t=
+\begin{cases}
+t_u\dfrac{z_a}{z_p}, & 0\le z_a\le z_p \\
+t_u, & z_a>z_p
+\end{cases},
+\qquad z_p=0.00254\ \mathrm{m}
+$$
+
+where $z_a$ is the relative axial displacement between the pile and the
+surrounding soil.
+
+#### Representative *q-z* Formulation
+
+For the API Sand end-bearing model,
+
+$$
+Q_u=q_uA_b,\qquad
+q_u=\min\left(N_q\sigma'_v,\;q_{\mathrm{lim}}\right)
+$$
+
+where $N_q$ is the bearing-capacity factor, $q_{\mathrm{lim}}$ is the limiting
+unit end-bearing resistance, and $A_b$ is the pile-base area. The reference
+settlement is
+
+$$
+z_{50}=0.013D
+$$
+
+where $z_{50}$ is the pile-tip settlement corresponding to 50% of the ultimate
+resistance. The complete *q-z* backbone curve is generated according to the
+implemented API relationship.
+
+### Numerical Model Generation
+
+After the spring properties are determined, ***PileAnalysis*** assigns the
+nonlinear spring responses to the corresponding zero-length elements and
+constructs the ***OpenSeesPy*** model. The same modular procedure is used for
+axial, lateral, combined-loading, and pile-group analyses. It also supports
+elastic or imported nonlinear fiber sections, automatic result visualization,
+and the export of generated spring and model data.
+
+The theoretical formulations describe established pile-analysis methods; the
+principal contribution of ***PileAnalysis*** is their integration within an
+open-source graphical workflow.
+
+---
+
+## *p*-Multiplier Definition and Application
+
+### Purpose
+
+In a laterally loaded pile group, the soil resistance acting on an individual
+pile may be lower than the resistance of an isolated pile because of
+pile-soil-pile interaction and shadowing effects. The *p*-multiplier,
+$m_p$, represents this reduction:
+
+$$
+p_{\mathrm{group}}=m_p\,p_{\mathrm{single}}
+$$
+
+where $p_{\mathrm{single}}$ is the lateral soil resistance obtained from the
+single-pile *p-y* relationship and $p_{\mathrm{group}}$ is the resistance used
+for the pile within the group.
+
+### Input Modes in PileAnalysis
+
+***PileAnalysis*** provides two alternative *p*-multiplier modes for nonlinear
+pile-group analysis.
+
+#### Automatic
+
+The program determines position-dependent *p*-multipliers from the relative
+pile positions and loading direction. The implemented automatic procedure
+follows the publicly documented part of the pile-group reduction method used
+by RSPile.
+pile positions and loading direction. The implemented procedure follows the
+group-effect reduction equations published in the
+[RSPile Group Effect documentation](https://www.rocscience.com/help/rspile/documentation/model-definition/group-pile-analysis/group-effect).
+The reduction is applied to the *p*-values of the lateral soil springs; the
+displacement axis of the *p-y* curve is not modified.
+
+This mode is intended for convenient preliminary analysis when project-specific
+or calibrated values are unavailable.
+For each target pile and each neighboring pile, the normalized center-to-center
+spacing is
+
+$$
+\lambda=\frac{s}{b}
+$$
+
+where $s$ is the center-to-center pile spacing and $b$ is the diameter of the
+target pile.
+
+For side-by-side piles, the reduction factor is
+
+$$
+\beta_a=
+\begin{cases}
+0.64, & \lambda\le1 \\
+0.64\lambda^{0.34}, & 1<\lambda<3.75 \\
+1.0, & \lambda\ge3.75
+\end{cases}
+$$
+
+For a leading pile in the loading direction, the in-line reduction factor is
+
+$$
+\beta_{bL}=
+\begin{cases}
+0.70, & \lambda\le1 \\
+0.70\lambda^{0.26}, & 1<\lambda<4.0 \\
+1.0, & \lambda\ge4.0
+\end{cases}
+$$
+
+For a trailing pile, the in-line reduction factor is
+
+$$
+\beta_{bT}=
+\begin{cases}
+0.48, & \lambda\le1 \\
+0.48\lambda^{0.38}, & 1<\lambda<7.0 \\
+1.0, & \lambda\ge7.0
+\end{cases}
+$$
+
+For a skewed pile pair, the side-by-side and in-line factors are combined using
+the elliptical interpolation
+
+$$
+\beta_s=
+\sqrt{\beta_b^2\cos^2\theta+\beta_a^2\sin^2\theta}
+$$
+
+where $\theta$ is the acute angle between the loading direction and the line
+connecting the two pile centers. The value of $\beta_b$ is selected as
+$\beta_{bL}$ or $\beta_{bT}$ according to whether the target pile is leading
+or trailing relative to the neighboring pile.
+
+The pairwise factor used by ***PileAnalysis*** is limited to the interval
+$[0.35,1.0]$:
+
+$$
+\widehat{\beta}_{s,ij}
+=\min\left(1.0,\max\left(0.35,\beta_{s,ij}\right)\right)
+$$
+
+For target pile $i$, the automatic *p*-multiplier is the most restrictive
+pairwise factor produced by the surrounding piles:
+
+$$
+m_{p,i}=\min_{j\ne i}\left(\widehat{\beta}_{s,ij}\right)
+$$
+
+If no neighboring pile contributes a group effect, $m_{p,i}=1.0$. The
+calculated multiplier is then applied to the complete single-pile *p-y*
+resistance:
+
+$$
+p_{i,\mathrm{group}}(y,z)
+=m_{p,i}\,p_{i,\mathrm{single}}(y,z)
+$$
+
+This automatic mode provides a reproducible position- and
+loading-direction-dependent estimate when project-specific or calibrated
+values are unavailable.
+
+#### Manual
+
+Users can directly assign a *p*-multiplier to each pile. The values may be
+obtained from design codes, experimental calibration, published
+recommendations, or benchmark software.
+
+Manual input makes the adopted group-reduction factors explicit and allows the
+same values to be used when reproducing a reference analysis. Each value should
+be positive and is normally no greater than 1.0:
+
+- $m_p=1.0$: no reduction relative to the single-pile *p-y* response.
+- $0<m_p<1.0$: reduced lateral soil resistance.
+
+<p align="center">
+  <img src="figs/p-multiper/p-multiper.png" width="75%" />
+</p>
+
+<p align="center">
+  <b>Figure 1. Automatic and manual p-multiplier input modes in PileAnalysis.</b>
+</p>
+
+### Recommended Workflow
+
+1. Define the pile layout, pile types, pile-cap connectivity, and loading
+   direction.
+2. Select **Automatic** when the built-in position-dependent evaluation is
+   appropriate.
+3. Select **Manual** when code-based, experimentally calibrated, or
+   benchmark-consistent values are available.
+4. Enter the multiplier for each pile and review the spatial distribution
+   before running the analysis.
+5. Record the adopted values when reporting or reproducing the model.
+
+### Role in the RSPile Benchmark
+
+The original benchmark used the automatic reduction procedures of the two
+programs and produced larger differences in shear force and bending moment.
+The benchmark was recalculated using the new manual mode and *p*-multiplier
+values consistent with the RSPile model. The resulting maximum relative
+differences were 1.46% for vertical displacement, 4.64% for horizontal
+displacement, 1.56% for axial force, 6.23% for shear force, and 5.36% for
+bending moment.
+
+---
+
+## Verification and Validation
+
+The nonlinear pile-soil interaction framework in ***PileAnalysis*** has been
+evaluated through comparison with RSPile and with a published quasi-static
+cyclic pile-group experiment.
+
+### Comparison with RSPile
+
+The pile-group benchmark was recalculated using manually specified
+*p*-multipliers consistent with the RSPile model. The depth-dependent response
+curves from the two programs show close agreement.
+
+| Response quantity | Maximum relative difference |
+|---|---:|
+| Vertical displacement | 1.46% |
+| Horizontal displacement | 4.64% |
+| Axial force | 1.56% |
+| Shear force | 6.23% |
+| Bending moment | 5.36% |
+
+<p align="center">
+  <img src="figs/validation/withrspile.png" width="95%" />
+</p>
+
+<p align="center">
+  <b>Figure 2. Comparison of PileAnalysis and RSPile pile-response results.</b>
+</p>
+
+The comparison also demonstrates why the adopted *p*-multiplier procedure
+should be reported explicitly. Using consistent group-reduction values
+substantially reduces the differences produced when each program uses its own
+automatic reduction process.
+
+### Validation against Published Experimental Data
+
+An additional validation case uses the S608 quasi-static cyclic test data for
+a scoured 2 x 3 reinforced-concrete pile-group foundation. The measured
+hysteresis and skeleton curves are compared with two numerical cases produced
+by ***PileAnalysis***.
+
+<p align="center">
+  <img src="figs/validation/withexp.png" width="90%" />
+</p>
+
+<p align="center">
+  <b>Figure 3. Comparison with the S608 quasi-static cyclic pile-group test.</b>
+</p>
+
+The test data are reported in:
+
+> Huang, Z., Ye, A., and Wang, X. (2025). "Data set from quasi-static cyclic
+> tests of scoured 2 x 3 pile-group foundations for bridge structures."
+> *Earthquake Spectra*, 41(3), 2598-2615.
+> [https://doi.org/10.1177/87552930251334069](https://doi.org/10.1177/87552930251334069)
+
+The associated public dataset is available from
+[Zenodo](https://doi.org/10.5281/zenodo.13762253).
+
+### Scope
+
+These comparisons support the reliability of the implemented nonlinear
+pile-soil interaction workflow for the evaluated cases. They do not remove the
+need for project-specific parameter selection, mesh checks, sensitivity
+analysis, and calibration when site-specific experimental data are available.
+
+---
+
+## Computational Performance
+
+The following results summarize the analysis time and peak memory usage of
+representative integrated examples from the m-method and nonlinear modules of
+***PileAnalysis***.
+
+| Method | Integrated example | Analysis time (s) | Peak memory usage (MB) |
+|---|---|---:|---:|
+| m-method | `mode_1_example.dat` | 0.0630 | 8.46 |
+| m-method | `mode_2_example.dat` | 0.0704 | 9.39 |
+| m-method | `mode_3_example.dat` | 0.0907 | 10.17 |
+| m-method | `pile_manual_example_01_12_pile_dual_case.dat` | 0.0879 | 10.11 |
+| m-method | `pile_manual_example_02_4_piles_with_simulated_pile.dat` | 0.0606 | 9.40 |
+| m-method | `pile_manual_example_03_16_inclined_piles.dat` | 0.1021 | 10.14 |
+| m-method | `pile_manual_example_04_3_pile_eccentric_simulated.dat` | 0.0666 | 9.40 |
+| Nonlinear method | `axial_validation_case.dat` | 0.5725 | 47.79 |
+| Nonlinear method | `lateral_validation_case.dat` | 1.0136 | 51.42 |
+| Nonlinear method | `combined_validation_case.dat` | 2.2837 | 61.39 |
+| Nonlinear method | `group_template_case.dat` | 8.1960 | 105.12 |
+
+### Interpretation
+
+- The Fortran-based m-method examples completed in approximately 0.06-0.10 s
+  with peak memory usage of approximately 8-11 MB.
+- The nonlinear single-pile examples completed in approximately 0.57-2.28 s
+  with peak memory usage of approximately 48-61 MB.
+- The nonlinear pile-group example was the most demanding evaluated case,
+  requiring approximately 8.20 s and 105 MB of peak memory.
+
+The nonlinear framework requires more time and memory because it constructs and
+solves a finite-element model with nonlinear soil springs. Actual performance
+depends on the processor, operating system, Python environment, mesh density,
+model size, constitutive models, and convergence behavior. The values above
+should therefore be interpreted as representative benchmark results rather
+than fixed hardware-independent limits.
+
+---
+
+## Comparison with Representative Pile-Analysis Software
+
+The table below summarizes major capabilities of ***PileAnalysis***, RSPile,
+and LPILE. It is intended as a high-level functional comparison; available
+features may vary by software version and license.
+
+| Functionality | PileAnalysis | RSPile | LPILE |
+|---|:---:|:---:|:---:|
+| Open-source | Yes | No | No |
+| Graphical user interface | Yes | Yes | Yes |
+| Linear m-method | Yes | No | No |
+| Nonlinear BNWF analysis | Yes | Yes | Yes |
+| Axial analysis | Yes | Yes | Yes |
+| Lateral analysis | Yes | Yes | Yes |
+| Combined loading analysis | Yes | Yes | No |
+| Pile-group analysis | Yes | Yes | Yes |
+| Automatic soil-spring generation | Yes | Yes | Yes |
+| Automatic OpenSees model generation | Yes | No | No |
+| Fiber-section import | Yes | Yes | No |
+| Spring/model export | Yes | Yes | Yes |
+| Python extensibility | Yes | Yes | No |
+| Dynamic analysis | No | Yes | No |
+| Seismic time-history analysis | No | Yes | No |
+
+### Positioning of PileAnalysis
+
+RSPile and LPILE are mature commercial pile-analysis programs. In contrast,
+***PileAnalysis*** provides an open-source graphical workflow that integrates:
+
+- a Fortran-based linear elastic m-method solver;
+- nonlinear *p-y*, *t-z*, and *q-z* analysis based on ***OpenSeesPy***;
+- axial, lateral, combined-loading, and pile-group analysis;
+- automatic finite-element and soil-spring model generation;
+- visualization and data export; and
+- optional nonlinear fiber-section input through ***SectionMCPy***.
+
+***OpenSeesPy*** is an open-source general-purpose structural analysis
+framework rather than a standalone pile-analysis GUI. It provides substantial
+modeling flexibility but normally requires users to create the model through
+Python scripts. ***PileAnalysis*** uses ***OpenSeesPy*** as its nonlinear
+analysis engine while providing a specialized graphical interface and
+automated pile-soil model generation.
+
+### Current Limitations
+
+The current version of ***PileAnalysis*** does not provide dynamic or seismic
+time-history analysis. The comparison should therefore be used to understand
+the intended scope of each program rather than as a claim that one tool is
+universally preferable.
