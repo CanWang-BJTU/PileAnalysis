@@ -35,6 +35,10 @@ _ZH_MAP = {
     "The first layer top is fixed at 0. Enter negative values downward from the ground line.": "首层顶面固定为 0，向下相对地面线输入负值。",
     "The global coordinate origin is fixed at the cap center. Cap bottom follows the highest pile top elevation.": "全局坐标原点固定在承台中心。承台底面随最高桩顶高程自动调整。",
     "Coordinates are in the cap plane with the cap center as the origin.": "坐标位于承台平面内，并以承台中心为原点。",
+    "p Multiplier:": "p 乘子:",
+    "Automatic": "自动",
+    "Manual": "手动",
+    "Calculated automatically by the program.": "由程序自动计算。",
     "Loads use the global X/Y/Z coordinate system. X and Y are the load coordinates on the cap plane.": "荷载采用全局 X/Y/Z 坐标系。X 和 Y 为承台平面内的加载坐标。",
 }
 

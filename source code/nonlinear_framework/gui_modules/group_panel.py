@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QMessageBox,
     QPushButton,
+    QRadioButton,
     QScrollArea,
     QTabWidget,
     QTableWidget,
@@ -603,9 +604,9 @@ class GroupPanel:
         root = QVBoxLayout(page)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(6)
-        self.layout_table = QTableWidget(0, 6)
-        self.layout_table.setHorizontalHeaderLabels(["X (m)", "Y (m)", "Top z (m)", "Bottom z (m)", "Pile Type", "Connectivity"])
-        for col in range(6):
+        self.layout_table = QTableWidget(0, 7)
+        self.layout_table.setHorizontalHeaderLabels(["X (m)", "Y (m)", "Top z (m)", "Bottom z (m)", "Pile Type", "Connectivity", "p Mult."])
+        for col in range(7):
             self.layout_table.horizontalHeader().setSectionResizeMode(col, QHeaderView.ResizeMode.Stretch)
         # Enter-key navigation: X -> Y -> Top z -> Bottom z -> next row X
         self._layout_delegate = install_enter_navigation(
@@ -615,7 +616,16 @@ class GroupPanel:
         root.addWidget(self.layout_table)
         tool_row = QHBoxLayout()
         tool_row.addWidget(create_help_button(page, "pile_layout"))
-        tool_row.addWidget(create_help_button(page, "connectivity"))
+        tool_row.addSpacing(10)
+        tool_row.addWidget(QLabel(tr("p Multiplier:")))
+        self.p_multiplier_auto_radio = QRadioButton(tr("Automatic"))
+        self.p_multiplier_manual_radio = QRadioButton(tr("Manual"))
+        self.p_multiplier_auto_radio.setChecked(True)
+        self.p_multiplier_auto_note = QLabel(tr("Calculated automatically by the program."))
+        self.p_multiplier_auto_note.setStyleSheet("color: #808080;")
+        tool_row.addWidget(self.p_multiplier_auto_radio)
+        tool_row.addWidget(self.p_multiplier_manual_radio)
+        tool_row.addWidget(self.p_multiplier_auto_note)
         tool_row.addStretch()
         root.addLayout(tool_row)
         hint = QLabel(tr("Tip: Press Enter to jump between coordinate cells."))
@@ -635,6 +645,9 @@ class GroupPanel:
         self.btn_add_layout.clicked.connect(lambda: self._add_layout_row())
         self.btn_delete_layout.clicked.connect(self._delete_layout_row)
         self.layout_table.itemChanged.connect(self._on_layout_item_changed)
+        self.p_multiplier_auto_radio.toggled.connect(self._on_p_multiplier_mode_changed)
+        self.p_multiplier_manual_radio.toggled.connect(self._on_p_multiplier_mode_changed)
+        self._on_p_multiplier_mode_changed()
         return page
 
     def _create_load_page(self) -> QWidget:
@@ -1471,7 +1484,16 @@ class GroupPanel:
         self._sync_cap_from_piles()
         self._notify_changed()
 
-    def _add_layout_row(self, x: float, y: float, top_z: float, bottom_z: float, pile_type_name: str, connectivity: str):
+    def _add_layout_row(
+        self,
+        x: float = 0.0,
+        y: float = 0.0,
+        top_z: float = 0.0,
+        bottom_z: float = -27.0,
+        pile_type_name: Optional[str] = None,
+        connectivity: str = "Fixed",
+        p_multiplier: Optional[float] = None,
+    ):
         row = self.layout_table.rowCount()
         self.layout_table.insertRow(row)
         self.layout_table.setItem(row, 0, QTableWidgetItem(f"{x:.4f}"))
@@ -1480,6 +1502,8 @@ class GroupPanel:
         self.layout_table.setItem(row, 3, QTableWidgetItem(f"{bottom_z:.4f}"))
         pile_combo = QComboBox()
         pile_combo.addItems(self._pile_type_names())
+        if pile_type_name is None and self._pile_type_names():
+            pile_type_name = self._pile_type_names()[0]
         if pile_type_name in self._pile_type_names():
             pile_combo.setCurrentText(pile_type_name)
         pile_combo.currentTextChanged.connect(lambda *_: self._notify_changed())
@@ -1489,7 +1513,17 @@ class GroupPanel:
         conn_combo.setCurrentText(connectivity)
         conn_combo.currentTextChanged.connect(lambda *_: self._notify_changed())
         self.layout_table.setCellWidget(row, 5, conn_combo)
+        if p_multiplier is None:
+            p_multiplier = 1.0
+        self.layout_table.setItem(row, 6, QTableWidgetItem(f"{float(p_multiplier):.4f}"))
         self._refresh_mesh_pile_selector()
+
+    @Slot()
+    def _on_p_multiplier_mode_changed(self):
+        manual = self.p_multiplier_manual_radio.isChecked()
+        self.p_multiplier_auto_note.setVisible(not manual)
+        self.layout_table.setColumnHidden(6, not manual)
+        self._notify_changed()
 
     @Slot()
     def _delete_layout_row(self):
@@ -1536,10 +1570,14 @@ class GroupPanel:
             y_item = self.layout_table.item(row, 1)
             top_item = self.layout_table.item(row, 2)
             bottom_item = self.layout_table.item(row, 3)
+            p_item = self.layout_table.item(row, 6)
             if None in (x_item, y_item, top_item, bottom_item):
                 continue
             pile_combo = self.layout_table.cellWidget(row, 4)
             conn_combo = self.layout_table.cellWidget(row, 5)
+            p_multiplier = 1.0
+            if p_item is not None and p_item.text().strip():
+                p_multiplier = float(p_item.text())
             pile_layout.append({
                 "x_m": float(x_item.text()),
                 "y_m": float(y_item.text()),
@@ -1547,6 +1585,7 @@ class GroupPanel:
                 "bottom_z_m": float(bottom_item.text()),
                 "pile_type_name": pile_combo.currentText() if isinstance(pile_combo, QComboBox) else "",
                 "connectivity": (conn_combo.currentText() if isinstance(conn_combo, QComboBox) else "Fixed").lower(),
+                "p_multiplier_manual": p_multiplier,
             })
 
         load_cases: List[Dict] = []
@@ -1609,6 +1648,8 @@ class GroupPanel:
             "pile_layout": pile_layout,
             "load_cases": load_cases,
             "loads": load_cases,
+            "p_multiplier_mode": "manual" if self.p_multiplier_manual_radio.isChecked() else "automatic",
+            "p_multiplier_manual": float(pile_layout[0].get("p_multiplier_manual", 1.0)) if pile_layout else 1.0,
             "coordinate_origin": "cap_center",
             "analysis_type": "static_group_3d",
             "active_models": ["py", "tz", "qz"],
@@ -1629,6 +1670,8 @@ class GroupPanel:
             QSignalBlocker(self.cap_length_y),
             QSignalBlocker(self.cap_height),
             QSignalBlocker(self.mesh_pile_selector),
+            QSignalBlocker(self.p_multiplier_auto_radio),
+            QSignalBlocker(self.p_multiplier_manual_radio),
         ]
         update_widgets = [
             getattr(self, "page_soil_material", None),
@@ -1707,7 +1750,15 @@ class GroupPanel:
             self.layout_table.setRowCount(0)
             for row in payload.get("pile_layout", []):
                 if isinstance(row, dict):
-                    self._add_layout_row(float(row.get("x_m", 0.0)), float(row.get("y_m", 0.0)), float(row.get("top_z_m", 0.0)), float(row.get("bottom_z_m", -27.0)), str(row.get("pile_type_name", self._pile_type_names()[0] if self._pile_type_names() else "")), str(row.get("connectivity", "Fixed")).capitalize())
+                    self._add_layout_row(
+                        float(row.get("x_m", 0.0)),
+                        float(row.get("y_m", 0.0)),
+                        float(row.get("top_z_m", 0.0)),
+                        float(row.get("bottom_z_m", -27.0)),
+                        str(row.get("pile_type_name", self._pile_type_names()[0] if self._pile_type_names() else "")),
+                        str(row.get("connectivity", "Fixed")).capitalize(),
+                        float(row.get("p_multiplier_manual", payload.get("p_multiplier_manual", 1.0))),
+                    )
 
             self.load_table.setRowCount(0)
             load_cases = payload.get("load_cases", [])
@@ -1744,6 +1795,10 @@ class GroupPanel:
                 else:
                     self._add_load_case_row()
 
+            p_mode = str(payload.get("p_multiplier_mode", "automatic")).lower()
+            self.p_multiplier_manual_radio.setChecked(p_mode == "manual")
+            self.p_multiplier_auto_radio.setChecked(p_mode != "manual")
+            self._on_p_multiplier_mode_changed()
             self._refresh_mesh_pile_selector()
             self._sync_cap_from_piles()
             self._update_section()

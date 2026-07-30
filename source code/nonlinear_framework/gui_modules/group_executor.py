@@ -20,6 +20,9 @@ except Exception as exc:
         MonolithicGroupPileSolver = None
 
 
+AUTO_P_FACTOR_POWER = 1.25
+
+
 class GroupExecutor:
     @staticmethod
     def _section_metadata(payload: Dict) -> Dict:
@@ -55,7 +58,7 @@ class GroupExecutor:
             )
 
         payload = dict(inp.payload)
-        solver = MonolithicGroupPileSolver(ele_size=payload.get("ele_size_m"))
+        solver = MonolithicGroupPileSolver(ele_size=payload.get("ele_size_m"), elastic_beam_mode="force")
 
         materials = {
             str(item.get("name", "")): dict(item)
@@ -156,7 +159,9 @@ class GroupExecutor:
 
         cap = dict(payload.get("cap", {}))
         cap_center_z = float(cap.get("center_z_m", 0.0))
+        cap_bottom_z = float(cap.get("bottom_z_m", cap_center_z - 0.5 * float(cap.get("height_m", 0.0))))
         cap_reference = (0.0, 0.0, cap_center_z)
+        load_reference = (0.0, 0.0, cap_bottom_z)
 
         fx_total = 0.0
         fy_total = 0.0
@@ -221,7 +226,26 @@ class GroupExecutor:
             load_direction_deg = math.degrees(math.atan2(fy_total, fx_total))
         else:
             load_direction_deg = 0.0
-        solver.auto_assign_pairwise_multipliers(load_direction_deg=load_direction_deg, combine="minimum")
+        if str(payload.get("p_multiplier_mode", "automatic")).lower() == "manual":
+            default_p_multiplier = float(payload.get("p_multiplier_manual", 1.0))
+            p_multipliers = []
+            for idx, row in enumerate(payload.get("pile_layout", []) or []):
+                if idx >= len(solver.piles):
+                    break
+                if isinstance(row, dict) and "p_multiplier_manual" in row:
+                    p_multipliers.append(float(row.get("p_multiplier_manual", default_p_multiplier)))
+                else:
+                    p_multipliers.append(default_p_multiplier)
+            if len(p_multipliers) < len(solver.piles):
+                p_multipliers.extend([default_p_multiplier] * (len(solver.piles) - len(p_multipliers)))
+            solver.set_p_multipliers(p_multipliers)
+            solver.set_y_multipliers([1.0] * len(solver.piles))
+        else:
+            p_multipliers = solver.auto_assign_pairwise_multipliers(
+                load_direction_deg=load_direction_deg,
+                combine="minimum",
+                p_factor_power=AUTO_P_FACTOR_POWER,
+            )
 
         raw = solver.build_and_analyze(
             Fx=fx_total,
@@ -234,13 +258,14 @@ class GroupExecutor:
             cap_fixity="3D",
             verbose=False,
             cap_reference=cap_reference,
-            load_location=cap_reference,
+            load_location=load_reference,
         )
 
         pile_results = raw.get("piles", [])
         return {
             "raw": raw,
             "piles": pile_results,
+            "p_multipliers": p_multipliers,
             "section_definition": GroupExecutor._section_metadata(payload),
             "cap_disp_x_mm": float(raw.get("cap_disp_x_mm", 0.0)),
             "cap_disp_y_mm": float(raw.get("cap_disp_y_mm", 0.0)),

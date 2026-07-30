@@ -118,6 +118,8 @@ def default_case_document() -> Dict:
                 "loads": [{"load_no": 1, "x_m": 0.0, "y_m": 0.0, "Fx": 0.0, "Fy": 0.0, "Fz": 0.0, "Mx": 0.0, "My": 0.0, "Mz": 0.0}],
                 "mesh_settings": default_mesh_settings(),
                 "mesh_settings_by_pile": {},
+                "p_multiplier_mode": "automatic",
+                "p_multiplier_manual": 1.0,
                 "coordinate_origin": "cap_center", "analysis_type": "static_group_3d", "active_models": ["py", "tz", "qz"], "steps": 40,
             },
         },
@@ -281,6 +283,8 @@ def blank_case_document() -> Dict:
                 "loads": [{"load_no": 1, "x_m": 0.0, "y_m": 0.0, "Fx": 0.0, "Fy": 0.0, "Fz": 0.0, "Mx": 0.0, "My": 0.0, "Mz": 0.0}],
                 "mesh_settings": default_mesh_settings(),
                 "mesh_settings_by_pile": {},
+                "p_multiplier_mode": "automatic",
+                "p_multiplier_manual": 1.0,
                 "coordinate_origin": "cap_center",
                 "analysis_type": "static_group_3d",
                 "active_models": ["py", "tz", "qz"],
@@ -477,10 +481,20 @@ def save_case(file_path: str, doc: Dict):
             _emit(lines, f"PILE_TYPE {idx}", [("NAME", pile_type.get("name", f"PileType-{idx}")), ("PILE_SHAPE", pile_type.get("pile_shape", "Circle")), ("PILE_TOP_Z", pile_type.get("pile_top_z_m", 0.0)), ("PILE_BOTTOM_Z", pile_type.get("pile_bottom_z_m", -27.0)), ("PILE_LENGTH", pile_type.get("pile_length_m", 27.0)), ("PILE_DIAMETER", pile_type.get("pile_diameter_m", 1.0)), ("PILE_THICKNESS", pile_type.get("pile_thickness_m", 0.04)), ("PILE_E", pile_type.get("pile_E_kPa", 3.0e7)), ("ELEMENT_SIZE", pile_type.get("ele_size_m", 0.0))])
             _emit_section_payload(lines, f"PILE_TYPE_SECTION_PAYLOAD {idx}", pile_type)
         cap = dict(payload.get("cap", {}))
-        _emit(lines, "CAP_DEFINITION", [("CAP_LENGTH_X", cap.get("length_x_m", 6.0)), ("CAP_LENGTH_Y", cap.get("length_y_m", 6.0)), ("CAP_HEIGHT", cap.get("height_m", 1.0))])
+        _emit(lines, "CAP_DEFINITION", [
+            ("CAP_LENGTH_X", cap.get("length_x_m", 6.0)),
+            ("CAP_LENGTH_Y", cap.get("length_y_m", 6.0)),
+            ("CAP_HEIGHT", cap.get("height_m", 1.0)),
+            ("CAP_CENTER_Z", cap.get("center_z_m", 0.0)),
+            ("CAP_BOTTOM_Z", cap.get("bottom_z_m", 0.0)),
+        ])
+        _emit(lines, "P_MULTIPLIER", [
+            ("MODE", payload.get("p_multiplier_mode", "automatic")),
+            ("MANUAL_VALUE", payload.get("p_multiplier_manual", 1.0)),
+        ])
         lines.extend(["[PILE_LAYOUT]", f"COUNT = {len(payload.get('pile_layout', []))}", ""])
         for idx, row in enumerate(payload.get("pile_layout", []), start=1):
-            _emit(lines, f"PILE {idx}", [("X", row.get("x_m", 0.0)), ("Y", row.get("y_m", 0.0)), ("TOP_Z", row.get("top_z_m", 0.0)), ("BOTTOM_Z", row.get("bottom_z_m", -27.0)), ("PILE_TYPE", row.get("pile_type_name", "")), ("CONNECTIVITY", row.get("connectivity", "fixed"))])
+            _emit(lines, f"PILE {idx}", [("X", row.get("x_m", 0.0)), ("Y", row.get("y_m", 0.0)), ("TOP_Z", row.get("top_z_m", 0.0)), ("BOTTOM_Z", row.get("bottom_z_m", -27.0)), ("PILE_TYPE", row.get("pile_type_name", "")), ("CONNECTIVITY", row.get("connectivity", "fixed")), ("P_MULTIPLIER", row.get("p_multiplier_manual", payload.get("p_multiplier_manual", 1.0)))])
         load_cases = payload.get("load_cases", payload.get("loads", []))
         lines.extend(["[LOAD_SETTING]", f"COUNT = {len(load_cases)}", ""])
         for idx, row in enumerate(load_cases, start=1):
@@ -571,7 +585,10 @@ def load_case(file_path: str) -> Dict:
         payload["loads"] = []
         payload["mesh_settings"] = default_mesh_settings()
         payload["mesh_settings_by_pile"] = {}
+        payload["p_multiplier_mode"] = "automatic"
+        payload["p_multiplier_manual"] = 1.0
         pile_type_sections: Dict[int, Dict] = {}
+        cap_bottom_from_file = False
         for header, block in blocks:
             if header.startswith("MATERIAL "):
                 payload["materials"].append({"name": str(block.get("NAME", "Material-1")), "bg_color": str(block.get("COLOR", "#dfe8d8")), "bg_alpha": 0.28, "axial_type": str(block.get("AXIAL_MODEL", "API Sand")), "axial_params": {AXIAL_ALIASES[k[6:]]: float(v) for k, v in block.items() if k.startswith("AXIAL_") and k[6:] in AXIAL_ALIASES and k != "AXIAL_MODEL"}, "lateral_type": str(block.get("LATERAL_MODEL", "Sand")), "lateral_params": {LATERAL_ALIASES[k[8:]]: float(v) for k, v in block.items() if k.startswith("LATERAL_") and k[8:] in LATERAL_ALIASES and k != "LATERAL_MODEL"}})
@@ -583,9 +600,22 @@ def load_case(file_path: str) -> Dict:
                 pile_idx = int(str(header).split()[-1])
                 pile_type_sections[pile_idx] = _load_section_payload(block)
             elif header == "CAP_DEFINITION":
-                payload["cap"].update({"length_x_m": float(block.get("CAP_LENGTH_X", 6.0)), "length_y_m": float(block.get("CAP_LENGTH_Y", 6.0)), "height_m": float(block.get("CAP_HEIGHT", 1.0))})
+                cap_height = float(block.get("CAP_HEIGHT", 1.0))
+                cap_bottom_from_file = "CAP_BOTTOM_Z" in block
+                cap_bottom = float(block.get("CAP_BOTTOM_Z", 0.0))
+                payload["cap"].update({
+                    "length_x_m": float(block.get("CAP_LENGTH_X", 6.0)),
+                    "length_y_m": float(block.get("CAP_LENGTH_Y", 6.0)),
+                    "height_m": cap_height,
+                    "center_z_m": float(block.get("CAP_CENTER_Z", cap_bottom + 0.5 * cap_height)),
+                    "bottom_z_m": cap_bottom,
+                })
+            elif header == "P_MULTIPLIER":
+                mode_value = str(block.get("MODE", "automatic")).lower()
+                payload["p_multiplier_mode"] = "manual" if mode_value == "manual" else "automatic"
+                payload["p_multiplier_manual"] = float(block.get("MANUAL_VALUE", 1.0))
             elif header.startswith("PILE "):
-                payload["pile_layout"].append({"x_m": float(block.get("X", 0.0)), "y_m": float(block.get("Y", 0.0)), "top_z_m": float(block.get("TOP_Z", 0.0)), "bottom_z_m": float(block.get("BOTTOM_Z", -27.0)), "pile_type_name": str(block.get("PILE_TYPE", "")), "connectivity": str(block.get("CONNECTIVITY", "fixed")).lower()})
+                payload["pile_layout"].append({"x_m": float(block.get("X", 0.0)), "y_m": float(block.get("Y", 0.0)), "top_z_m": float(block.get("TOP_Z", 0.0)), "bottom_z_m": float(block.get("BOTTOM_Z", -27.0)), "pile_type_name": str(block.get("PILE_TYPE", "")), "connectivity": str(block.get("CONNECTIVITY", "fixed")).lower(), "p_multiplier_manual": float(block.get("P_MULTIPLIER", payload.get("p_multiplier_manual", 1.0)))})
             elif header.startswith("LOAD "):
                 if any(key in block for key in ("FX", "FY", "FZ", "MX", "MY", "MZ")):
                     payload["load_cases"].append({
@@ -654,6 +684,22 @@ def load_case(file_path: str) -> Dict:
                 )
         for idx, pile_type in enumerate(payload["pile_types"], start=1):
             pile_type.update(pile_type_sections.get(idx, {}))
+        if not cap_bottom_from_file:
+            pile_tops = [
+                float(row.get("top_z_m", 0.0))
+                for row in payload.get("pile_layout", [])
+                if isinstance(row, dict)
+            ]
+            if not pile_tops:
+                pile_tops = [
+                    float(row.get("pile_top_z_m", 0.0))
+                    for row in payload.get("pile_types", [])
+                    if isinstance(row, dict)
+                ]
+            cap_bottom = max(pile_tops) if pile_tops else float(payload["cap"].get("bottom_z_m", 0.0))
+            cap_height = float(payload["cap"].get("height_m", 1.0))
+            payload["cap"]["bottom_z_m"] = cap_bottom
+            payload["cap"]["center_z_m"] = cap_bottom + 0.5 * cap_height
         if not payload["load_cases"] and payload["loads"]:
             merged = {"load_no": 1, "x_m": 0.0, "y_m": 0.0, "Fx": 0.0, "Fy": 0.0, "Fz": 0.0, "Mx": 0.0, "My": 0.0, "Mz": 0.0}
             for row in payload["loads"]:

@@ -37,7 +37,7 @@ class CombinedExecutor:
                 f"Import error: {COMBINED_SOLVER_IMPORT_ERROR!r}"
             )
 
-        solver = MonolithicGroupPileSolver(ele_size=inp.ele_size_m)
+        solver = MonolithicGroupPileSolver(ele_size=inp.ele_size_m, elastic_beam_mode="force")
         solver.add_pile(
             x=0.0,
             y=0.0,

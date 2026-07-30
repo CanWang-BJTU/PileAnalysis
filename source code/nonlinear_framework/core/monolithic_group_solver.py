@@ -26,13 +26,15 @@ except Exception:
 
 class MonolithicGroupPileSolver:
 
-    def __init__(self, ele_size=None, spring_model_mode='multilinear'):
+    def __init__(self, ele_size=None, spring_model_mode='multilinear',
+                 elastic_beam_mode='timoshenko'):
         self.piles = []
         self.lat_layers = []           
         self.ax_layers = []            
         self.tip_soil = None            
         self.ele_size = ele_size
         self.spring_model_mode = str(spring_model_mode or 'multilinear').lower()
+        self.elastic_beam_mode = str(elastic_beam_mode or 'timoshenko').lower()
         self.results = None
         self._mat_tag = 1
         self._ele_tag = 1
@@ -224,11 +226,11 @@ class MonolithicGroupPileSolver:
             pile['p_mult'] = float(p_mult)
 
     def set_y_multipliers(self, y_multipliers):
-        """Retained for compatibility; strict-theory solver keeps y-multipliers neutral."""
+        """Assign y-stretch multipliers for elastic group interaction."""
         if len(y_multipliers) != len(self.piles):
             raise ValueError("Length of y_multipliers must match number of piles.")
-        for pile in self.piles:
-            pile['y_mult'] = 1.0
+        for pile, y_mult in zip(self.piles, y_multipliers):
+            pile['y_mult'] = y_mult
 
     def auto_assign_row_reduced_multipliers(self, load_direction_deg=0.0,
                                             leading_factor=0.90,
@@ -295,6 +297,7 @@ class MonolithicGroupPileSolver:
     def auto_assign_pairwise_multipliers(self, load_direction_deg=0.0,
                                          combine='product',
                                          min_factor=0.35,
+                                         p_factor_power=1.0,
                                          assign_elastic_y=False):
         """Apply official-style pairwise group-effect multipliers to p-y resistance only."""
         if not self.piles:
@@ -337,8 +340,19 @@ class MonolithicGroupPileSolver:
             else:
                 p_factors.append(float(np.prod(pair_factors)))
 
+        power = max(float(p_factor_power), 1.0e-6)
+        if abs(power - 1.0) > 1.0e-12:
+            p_factors = [float(np.clip(factor, min_factor, 1.0)) ** power for factor in p_factors]
+
         self.set_p_multipliers(p_factors)
-        self.set_y_multipliers([1.0] * len(self.piles))
+        if assign_elastic_y:
+            y_profiles = [
+                self._build_elastic_group_y_profile(pile['D'], p_factor)
+                for pile, p_factor in zip(self.piles, p_factors)
+            ]
+            self.set_y_multipliers(y_profiles)
+        else:
+            self.set_y_multipliers([1.0] * len(self.piles))
         return p_factors
 
     @staticmethod
@@ -773,6 +787,23 @@ class MonolithicGroupPileSolver:
             }
         return section_tags, segments
 
+    def _build_elastic_section_integration_3d(self, pile, G_shear, J_torsion):
+        """Build a 3D elastic section for forceBeamColumn elastic elements."""
+        sec_tag = self._next_mat()
+        ops.section(
+            'Elastic',
+            sec_tag,
+            pile['E'],
+            pile['A'],
+            pile['I'],
+            pile['I'],
+            G_shear,
+            J_torsion,
+        )
+        bi_tag = self._next_mat()
+        ops.beamIntegration('Lobatto', bi_tag, sec_tag, 5)
+        return bi_tag
+
     def _integration_tag_for_position(self, arc_length, section_tags, segments):
         if not section_tags or not segments:
             return None
@@ -1026,6 +1057,9 @@ class MonolithicGroupPileSolver:
         shear_corr = 6.0 * (1.0 + poisson) / (7.0 + 6.0 * poisson)
         A_shear = max(shear_corr * p['A'], 1.0e-12)
         fiber_section_tags, fiber_segments = self._build_fiber_section_tags(p)
+        elastic_integration_tag = None
+        if fiber_section_tags is None and self.elastic_beam_mode in ('force', 'force_beam_column', 'forcebeamcolumn'):
+            elastic_integration_tag = self._build_elastic_section_integration_3d(p, G_shear, J_torsion)
         for i in range(n_eles):
             etag = self._next_ele()
             arc_mid = 0.5 * (node_arc_lengths[i] + node_arc_lengths[i + 1])
@@ -1034,6 +1068,10 @@ class MonolithicGroupPileSolver:
                 ops.element('forceBeamColumn', etag,
                             pile_nodes[i], pile_nodes[i + 1],
                             transf_tag, integration_tag)
+            elif elastic_integration_tag is not None:
+                ops.element('forceBeamColumn', etag,
+                            pile_nodes[i], pile_nodes[i + 1],
+                            transf_tag, elastic_integration_tag)
             else:
                 ops.element('ElasticTimoshenkoBeam', etag,
                             pile_nodes[i], pile_nodes[i + 1],
@@ -1237,10 +1275,12 @@ class MonolithicGroupPileSolver:
 
             if pult < 1e-6 or y50 is None:
                 # Elastic spring or negligible
-                k_spring = pult * L_trib if y50 is None else 1e-3
+                y_mult_i = self._resolve_y_multiplier(y_mult, z_vert, layer)
+                k_spring = (pult * L_trib / y_mult_i) if y50 is None else 1e-3
                 ops.uniaxialMaterial('Elastic', mat, k_spring)
             elif self.spring_model_mode == 'native':
                 native_soil_type = self._native_py_soil_type(soil_type)
+                y_mult_i = self._resolve_y_multiplier(y_mult, z_vert, layer)
                 if native_soil_type is None:
                     y_small = np.array([0, 1e-4, 5e-4, 1e-3, 3e-3, 5e-3])
                     y_linear = np.linspace(y_max / n_py_pts, y_max, n_py_pts)[1:]
@@ -1250,9 +1290,10 @@ class MonolithicGroupPileSolver:
                     p_mult_i = self._resolve_p_multiplier(p_mult, z_vert, layer)
                     force_pos = p_curve * L_trib * p_mult_i
                     force_pos[0] = 0.0
-                    y_neg = -y_vals[::-1][:-1]
+                    strain_pos = y_vals * y_mult_i
+                    y_neg = -strain_pos[::-1][:-1]
                     f_neg = -force_pos[::-1][:-1]
-                    y_all = np.concatenate([y_neg, y_vals])
+                    y_all = np.concatenate([y_neg, strain_pos])
                     f_all = np.concatenate([f_neg, force_pos])
                     ops.uniaxialMaterial('ElasticMultiLinear', mat,
                                          '-strain', *y_all.tolist(),
@@ -1264,7 +1305,7 @@ class MonolithicGroupPileSolver:
                         mat,
                         native_soil_type,
                         float(pult * L_trib * p_mult_i),
-                        float(y50),
+                        float(y50 * y_mult_i),
                         0.3,
                     )
             else:
@@ -1323,13 +1364,15 @@ class MonolithicGroupPileSolver:
                 # Convert distributed resistance to tributary nodal force and
                 # apply only the theoretical group-effect reduction fm.
                 p_mult_i = self._resolve_p_multiplier(p_mult, z_vert, layer)
+                y_mult_i = self._resolve_y_multiplier(y_mult, z_vert, layer)
                 force_pos = p_curve * L_trib * p_mult_i
                 force_pos[0] = 0.0
 
                       
-                y_neg = -y_vals[::-1][:-1]
+                strain_pos = y_vals * y_mult_i
+                y_neg = -strain_pos[::-1][:-1]
                 f_neg = -force_pos[::-1][:-1]
-                y_all = np.concatenate([y_neg, y_vals])
+                y_all = np.concatenate([y_neg, strain_pos])
                 f_all = np.concatenate([f_neg, force_pos])
 
                 ops.uniaxialMaterial('ElasticMultiLinear', mat,

@@ -156,9 +156,10 @@ LEGACY_HELP_TEXTS: Dict[str, str] = {
     "axial_load_table": "Axial Load Input\n\nCompression is negative and tension is positive in global Z.",
     "lateral_load_table": "Lateral Load Input\n\nPure lateral analysis uses Fx, Fy, Mx and My only. Axial force belongs to combined analysis.",
     "combined_load_table": "Combined Load Input\n\nInput axial force, shear and moment in one table.",
-    "group_load_table": "Group Load Input\n\nEach row is one load case. Enter cap-plane X and Y first, then fill the six global load components Fx, Fy, Fz, Mx, My and Mz for that row.",
-    "pile_layout": "Pile Layout\n\nEach row defines one pile location, pile type and connectivity.",
+    "group_load_table": "Group Load Input\n\nEach row is one load case. X and Y locate the load on the cap-bottom plane; the load elevation is the cap bottom. Fill the six global load components Fx, Fy, Fz, Mx, My and Mz for that row.",
+    "pile_layout": "Pile Layout\n\nEach row defines one pile location, pile type and connectivity.\n\np Multiplier: Automatic lets the program calculate group-effect p multipliers from the pile layout and load direction. Manual applies the entered p multiplier to all piles.",
     "connectivity": "Connectivity\n\nFixed is rotationally restrained, Pinned is released, Restrained is intermediate.",
+    "p_multiplier": "p Multiplier\n\nAutomatic lets the program calculate group-effect p multipliers from the pile layout and load direction. Manual applies the entered p multiplier to all piles.",
 }
 
 
@@ -521,9 +522,10 @@ _ZH_LEGACY_HELP_TEXTS: Dict[str, str] = {
     "axial_load_table": "轴向荷载输入\n\n全局 Z 方向中，受压为负，受拉为正。",
     "lateral_load_table": "横向荷载输入\n\n纯横向分析通常只使用 Fx、Fy、Mx、My；轴力应放在组合分析中输入。",
     "combined_load_table": "组合荷载输入\n\n在同一张表中输入轴力、剪力与弯矩。",
-    "group_load_table": "群桩荷载输入\n\n每一行对应一个荷载工况。先输入承台平面内的 X、Y 坐标，再填写 Fx、Fy、Fz、Mx、My、Mz 六个全局荷载分量。",
-    "pile_layout": "桩位布置\n\n每一行定义一根桩的位置、桩型以及连接方式。",
+    "group_load_table": "群桩荷载输入\n\n每一行对应一个荷载工况。X、Y 表示荷载在承台底面平面内的位置；荷载标高取承台底部。然后填写 Fx、Fy、Fz、Mx、My、Mz 六个全局荷载分量。",
+    "pile_layout": "桩位布置\n\n每一行定义一根桩的位置、桩型以及连接方式。\n\np 乘子：自动模式下，程序根据桩位布置和荷载方向自动计算群桩效应 p 乘子；手动模式下，输入的 p 乘子将应用于所有桩。",
     "connectivity": "连接方式\n\nFixed 表示转动约束，Pinned 表示铰接释放，Restrained 表示部分约束。",
+    "p_multiplier": "p 乘子\n\n自动模式下，程序根据桩位布置和荷载方向自动计算群桩效应 p 乘子。手动模式下，输入的 p 乘子将应用于所有桩。",
 }
 
 

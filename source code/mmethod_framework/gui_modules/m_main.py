@@ -1,4 +1,4 @@
-                                                                         
+﻿                                                                         
                                                       
                             
                                      
@@ -2042,7 +2042,7 @@ class MainWindow(QMainWindow):
         self.email_label = lbl_email
 
                          
-        lbl_version = QLabel("版本：3.0")
+        lbl_version = QLabel("版本：3.0.1")
         lbl_version.setStyleSheet(column_style)
         self.status_bar.addWidget(lbl_version)
         self.version_label = lbl_version
@@ -8140,7 +8140,7 @@ class MainWindow(QMainWindow):
     def _show_about(self):
         QMessageBox.about(
             self, "关于 桩基分析程序",
-            "<h3>桩基分析程序 (PileAnalysis) v3.0</h3>"
+            "<h3>桩基分析程序 (PileAnalysis) v3.0.1</h3>"
             "<p>基于Pyside6开发的桩基有限元分析的前后处理程序。</p>"
             "<p><b>作者：</b>汪灿，郭军军</p>"
             "<p><b>单位：</b>北京交通大学 土木建筑工程学院</p>" \
@@ -8300,7 +8300,7 @@ _EN_REPLACEMENTS = [
     ("教程(&T)", "Tutorial (&T)"),
     ("模式一算例：群桩刚度", "Mode 1 Example: Group Pile Stiffness"),
     ("模式二算例：单桩刚度", "Mode 2 Example: Single Pile Stiffness"),
-    ("模式三算例：桩基反算", "Mode 3 Example: Back Analysis"),
+    ("模式三算例：桩基反算", "Mode 3 Example: Load-Response Analysis"),
     ("PILE说明书算例 (导入)", "PILE Manual Examples (Import)"),
     ("算例1: 12桩双工况", "Example 1: 12-Pile Dual Load Cases"),
     ("算例2: 4桩带模拟桩", "Example 2: 4 Piles with Simulated Pile"),
@@ -8334,8 +8334,8 @@ _EN_REPLACEMENTS = [
     ("导出失败", "Export Failed"),
     ("计算失败", "Calculation Failed"),
     ("计算中", "Running Analysis"),
-    ("反算计算中", "Running Back Analysis"),
-    ("反算计算失败 - 详细信息", "Back Analysis Failed - Details"),
+    ("反算计算中", "Running Load-Response Analysis"),
+    ("反算计算失败 - 详细信息", "Load-Response Analysis Failed - Details"),
     ("导入成功", "Import Completed"),
 ]
 
@@ -8360,19 +8360,19 @@ def _translate_to_english(text):
     translated = translated.replace("桩基数量:", "Number of piles:")
     translated = translated.replace("模式一：群桩刚度", "Mode 1: Group Pile Stiffness")
     translated = translated.replace("模式二：单桩刚度", "Mode 2: Single Pile Stiffness")
-    translated = translated.replace("模式三：桩基反算", "Mode 3: Back Analysis")
+    translated = translated.replace("模式三：桩基反算", "Mode 3: Load-Response Analysis")
     translated = translated.replace("模式一：群Pile刚度", "Mode 1: Group Pile Stiffness")
     translated = translated.replace("模式二：单Pile刚度", "Mode 2: Single Pile Stiffness")
-    translated = translated.replace("模式三：Pile基反算", "Mode 3: Back Analysis")
+    translated = translated.replace("模式三：Pile基反算", "Mode 3: Load-Response Analysis")
     translated = translated.replace("模式一算例：", "Mode 1 Example: ")
     translated = translated.replace("模式二算例：", "Mode 2 Example: ")
     translated = translated.replace("模式三算例：", "Mode 3 Example: ")
     translated = translated.replace("群桩刚度", "Group Pile Stiffness")
     translated = translated.replace("单桩刚度", "Single Pile Stiffness")
-    translated = translated.replace("桩基反算", "Back Analysis")
+    translated = translated.replace("桩基反算", "Load-Response Analysis")
     translated = translated.replace("群Pile刚度", "Group Pile Stiffness")
     translated = translated.replace("单Pile刚度", "Single Pile Stiffness")
-    translated = translated.replace("Pile基反算", "Back Analysis")
+    translated = translated.replace("Pile基反算", "Load-Response Analysis")
     translated = translated.replace("模拟桩基:", "Simulated piles:")
     translated = translated.replace("未启用", "Not enabled")
     translated = translated.replace("注意：导入将覆盖当前未保存的设置，是否继续？", "Note: the import will overwrite the current unsaved settings. Do you want to continue?")
@@ -8479,7 +8479,7 @@ def _translate_to_english(text):
     translated = translated.replace("PILE说明书算例 (导入)", "PILE Manual Examples (Import)")
     translated = translated.replace("模式一算例：群Pile刚度", "Mode 1 Example: Group Pile Stiffness")
     translated = translated.replace("模式二算例：单Pile刚度", "Mode 2 Example: Single Pile Stiffness")
-    translated = translated.replace("模式三算例：Pile基反算", "Mode 3 Example: Back Analysis")
+    translated = translated.replace("模式三算例：Pile基反算", "Mode 3 Example: Load-Response Analysis")
     translated = translated.replace("算例1: 12Pile双工况", "Example 1: 12-Pile Dual Load Cases")
     translated = translated.replace("算例2: 4Pile带模拟Pile", "Example 2: 4 Piles with Simulated Pile")
     translated = translated.replace("算例3: 16Pile斜Pile差异化", "Example 3: 16 Inclined Piles with Variation")
@@ -8644,7 +8644,7 @@ class EnglishTutorialDialog(TutorialDialog):
         tutorial_titles = [
             "Mode 1 Example: Group Pile Stiffness",
             "Mode 2 Example: Single Pile Stiffness",
-            "Mode 3 Example: Back Analysis",
+            "Mode 3 Example: Load-Response Analysis",
         ]
         tutorial_html = [
             """
@@ -8682,7 +8682,7 @@ class EnglishTutorialDialog(TutorialDialog):
             </div>
             """,
             """
-            <h4 style='color: black;'>Mode 3: Back Analysis of the Pile Foundation</h4>
+            <h4 style='color: black;'>Mode 3: Load-Response Analysis of the Pile Foundation</h4>
             <p>This example starts from cap-level displacement or equivalent load information and reconstructs the response of the pile foundation.</p>
             <p><b>Recommended use:</b> Use this case when the back-analysis workflow is required.</p>
             <hr>
@@ -9008,7 +9008,7 @@ def _translate_export_csv_text(text):
         ("桩基分析 结果摘要导出文件", "Pile Foundation Analysis Summary Export"),
         ("导出时间:", "Export time:"),
         ("计算模式:", "Analysis mode:"),
-        ("桩基反算", "Back Analysis"),
+        ("桩基反算", "Load-Response Analysis"),
         ("群桩刚度", "Group Pile Stiffness"),
         ("单桩刚度", "Single Pile Stiffness"),
         ("输入荷载", "Input Loads"),
@@ -9556,7 +9556,7 @@ def _force_english_menu_titles(window):
     action_map = {
         "模式一算例：群Pile刚度": "Mode 1 Example: Group Pile Stiffness",
         "模式二算例：单Pile刚度": "Mode 2 Example: Single Pile Stiffness",
-        "模式三算例：Pile基反算": "Mode 3 Example: Back Analysis",
+        "模式三算例：Pile基反算": "Mode 3 Example: Load-Response Analysis",
         "PILE Manual Examples (Import)": "PILE Manual Examples (Import)",
         "算例1: 12Pile双工况": "Example 1: 12-Pile Dual Load Cases",
         "算例2: 4Pile带模拟Pile": "Example 2: 4 Piles with Simulated Pile",
@@ -10036,7 +10036,7 @@ def _apply_english_mainwindow_texts(window):
     _set_radio_text(window, "\u65b0\u5efa\u5de5\u51b5", "New Case")
     _set_radio_text(window, "\u6a21\u5f0f\u4e00\uff1a\u7fa4\u6869\u521a\u5ea6", "Mode 1: Group Pile Stiffness")
     _set_radio_text(window, "\u6a21\u5f0f\u4e8c\uff1a\u5355\u6869\u521a\u5ea6", "Mode 2: Single Pile Stiffness")
-    _set_radio_text(window, "\u6a21\u5f0f\u4e09\uff1a\u6869\u57fa\u53cd\u7b97", "Mode 3: Back Analysis")
+    _set_radio_text(window, "\u6a21\u5f0f\u4e09\uff1a\u6869\u57fa\u53cd\u7b97", "Mode 3: Load-Response Analysis")
     for radio in window.findChildren(QRadioButton):
         text = radio.text().strip()
         if "模式一" in text:
@@ -10044,7 +10044,7 @@ def _apply_english_mainwindow_texts(window):
         elif "模式二" in text:
             radio.setText("Mode 2: Single Pile Stiffness")
         elif "模式三" in text:
-            radio.setText("Mode 3: Back Analysis")
+            radio.setText("Mode 3: Load-Response Analysis")
 
     _set_button_text(window, "\u8fd4\u56de\u5de5\u51b5\u9009\u62e9", "Back to Case Selection")
     _set_button_text(window, "\u5bfc\u5165\u5df2\u6709\u5de5\u51b5\uff08dat\u6587\u4ef6\uff09", "Import Existing Case (.dat)")
@@ -10087,7 +10087,7 @@ def _apply_english_mainwindow_texts(window):
     if hasattr(window, "email_label"):
         window.email_label.setText("Contact: 24231238@bjtu.edu.cn / jjguo2@bjtu.edu.cn")
     if hasattr(window, "version_label"):
-        window.version_label.setText("Version: 3.0")
+        window.version_label.setText("Version: 3.0.1")
     if hasattr(window, "download_label"):
         window.download_label.setText(
             "<a href='https://github.com/CanWang-BJTU/PileAnalysis' style='color: #000000; text-decoration: none;'>Update</a>"
@@ -10540,7 +10540,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 
 

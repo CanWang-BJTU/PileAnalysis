@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 import os
 import sys
@@ -585,7 +585,7 @@ class MainWindow(QMainWindow):
         current_language = get_language()
         author_text = "Authors: Wang Can, Guo Junjun" if current_language != "zh" else "作者：汪灿，郭军军"
         contact_text = "Contact: 24231238@bjtu.edu.cn / jjguo2@bjtu.edu.cn" if current_language != "zh" else "联系方式：24231238@bjtu.edu.cn / jjguo2@bjtu.edu.cn"
-        version_text = "Version: 3.0" if current_language != "zh" else "版本：3.0"
+        version_text = "Version: 3.0.1" if current_language != "zh" else "版本：3.0.1"
         update_label = "Update" if current_language != "zh" else "更新"
 
         lbl_author = QLabel(author_text)
@@ -1860,27 +1860,27 @@ class MainWindow(QMainWindow):
             disp_x = pile.get("disps_dx", [])
             disp_y = pile.get("disps_dy", [])
             disp_z = pile.get("disps_dz", [])
-            section_depths = pile.get("section_depths_from_head", [])
+            section_depths = pile.get("depths_ele_from_head", [])
             axial = pile.get("axial_forces", [])
-            shear_x = pile.get("section_rspile_shear_x", [])
-            shear_y = pile.get("section_rspile_shear_y", [])
-            moment_x = pile.get("section_rspile_moment_x", [])
-            moment_y = pile.get("section_rspile_moment_y", [])
+            shear_x = pile.get("rspile_shear_x", [])
+            shear_y = pile.get("rspile_shear_y", [])
+            moment_x = pile.get("rspile_moment_x", [])
+            moment_y = pile.get("rspile_moment_y", [])
             row_count = max(len(depths), len(section_depths), len(axial), len(shear_x), len(shear_y), len(moment_x), len(moment_y))
             pile_rows = []
             for row_idx in range(row_count):
                 pile_rows.append([
                     row_idx + 1,
-                    float(depths[row_idx]) if row_idx < len(depths) else 0.0,
-                    float(disp_x[row_idx]) if row_idx < len(disp_x) else 0.0,
-                    float(disp_y[row_idx]) if row_idx < len(disp_y) else 0.0,
-                    float(disp_z[row_idx]) if row_idx < len(disp_z) else 0.0,
-                    float(section_depths[row_idx]) if row_idx < len(section_depths) else 0.0,
-                    float(axial[row_idx]) if row_idx < len(axial) else 0.0,
-                    float(shear_x[row_idx]) if row_idx < len(shear_x) else 0.0,
-                    float(shear_y[row_idx]) if row_idx < len(shear_y) else 0.0,
-                    float(moment_x[row_idx]) if row_idx < len(moment_x) else 0.0,
-                    float(moment_y[row_idx]) if row_idx < len(moment_y) else 0.0,
+                    float(depths[row_idx]) if row_idx < len(depths) else None,
+                    float(disp_x[row_idx]) if row_idx < len(disp_x) else None,
+                    float(disp_y[row_idx]) if row_idx < len(disp_y) else None,
+                    float(disp_z[row_idx]) if row_idx < len(disp_z) else None,
+                    float(section_depths[row_idx]) if row_idx < len(section_depths) else None,
+                    float(axial[row_idx]) if row_idx < len(axial) else None,
+                    float(shear_x[row_idx]) if row_idx < len(shear_x) else None,
+                    float(shear_y[row_idx]) if row_idx < len(shear_y) else None,
+                    float(moment_x[row_idx]) if row_idx < len(moment_x) else None,
+                    float(moment_y[row_idx]) if row_idx < len(moment_y) else None,
                 ])
             pile_rows_list.append(pile_rows)
         return overview_headers, overview_rows, pile_headers, pile_rows_list
@@ -2425,7 +2425,7 @@ _ZH_TRANSLATIONS = {
     "Help": "帮助",
     "Authors: Can Wang, Junjun Guo": "作者: Can Wang, Junjun Guo",
     "Contact: 24231238@bjtu.edu.cn / jjguo2@bjtu.edu.cn": "联系方式: 24231238@bjtu.edu.cn / jjguo2@bjtu.edu.cn",
-    "Version: 3.0": "版本: 3.0",
+    "Version: 3.0.1": "版本: 3.0.1",
     "Project Repository": "项目仓库",
     "Ready": "就绪",
     "Case Selection": "工况选择",
@@ -2472,7 +2472,7 @@ _ZH_TRANSLATIONS.update(
         "Authors: Wang Can, Guo Junjun": "作者：汪灿，郭军军",
         "Authors: Can Wang, Junjun Guo": "作者：汪灿，郭军军",
         "Contact: 24231238@bjtu.edu.cn / jjguo2@bjtu.edu.cn": "联系方式：24231238@bjtu.edu.cn / jjguo2@bjtu.edu.cn",
-        "Version: 3.0": "版本：3.0",
+        "Version: 3.0.1": "版本：3.0.1",
         "Project Repository": "更新",
         "Update": "更新",
         "Axial Tutorial": "轴向算例",
@@ -2493,7 +2493,7 @@ _ZH_TRANSLATIONS.update(
         "Authors: Wang Can, Guo Junjun": "作者：汪灿，郭军军",
         "Authors: Can Wang, Junjun Guo": "作者：汪灿，郭军军",
         "Contact: 24231238@bjtu.edu.cn / jjguo2@bjtu.edu.cn": "联系方式：24231238@bjtu.edu.cn / jjguo2@bjtu.edu.cn",
-        "Version: 3.0": "版本：3.0",
+        "Version: 3.0.1": "版本：3.0.1",
         "Project Repository": "更新",
         "Update": "更新",
         "Axial Tutorial": "轴向算例",
