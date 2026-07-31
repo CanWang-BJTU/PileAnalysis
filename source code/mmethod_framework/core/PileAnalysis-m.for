@@ -1,12 +1,11 @@
-c
-c                             BCAD_PILE
+
 c
 c    This program is aimed to execute spatial statical analysis of pile
 c                  foundations of bridge substructures.
 c
 c
 c***********************************************************************
-c          Main routine of the BCAD_PILE program
+c          Main routine of the PileAnalysis-m program
 c***********************************************************************
 c
 c     The function of this main routine is to control the procedure of 
