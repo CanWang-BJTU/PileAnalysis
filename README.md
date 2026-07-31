@@ -1188,7 +1188,7 @@ the MIT License. Users may obtain it in any of the following ways:
   [direct raw-source download](https://raw.githubusercontent.com/CanWang-BJTU/PileAnalysis/main/source%20code/mmethod_framework/core/PileAnalysis-m.for)
   is also available.
 
-- [Download the precompiled Windows executable (`BCAD-PILE.exe`)](https://github.com/CanWang-BJTU/PileAnalysis/raw/refs/heads/main/source%20code/mmethod_framework/core/BCAD-PILE.exe)
+- [Download the precompiled Windows executable (`PileAnalysis-m solver.exe`)](https://github.com/CanWang-BJTU/PileAnalysis/raw/refs/heads/main/source%20code/mmethod_framework/core/BCAD-PILE.exe)
   if recompilation is not required.
 
 #### Compilation with GNU Fortran
