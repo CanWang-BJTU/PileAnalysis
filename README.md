@@ -48,10 +48,11 @@
 Click the links below to jump to the technical documentation at the end of this README:
 
 1. [Theoretical Formulation and Computational Implementation](#theoretical-formulation-and-computational-implementation)
-2. [*p*-Multiplier Definition and Application](#p-multiplier-definition-and-application)
-3. [Verification and Validation](#verification-and-validation)
-4. [Computational Performance](#computational-performance)
-5. [Comparison with Representative Pile-Analysis Software](#comparison-with-representative-pile-analysis-software)
+2. [Fortran m-Method Solver: Download and Compilation](#fortran-m-method-solver-download-and-compilation)
+3. [*p*-Multiplier Definition and Application](#p-multiplier-definition-and-application)
+4. [Verification and Validation](#verification-and-validation)
+5. [Computational Performance](#computational-performance)
+6. [Comparison with Representative Pile-Analysis Software](#comparison-with-representative-pile-analysis-software)
 
 # Tutorial
 
@@ -1169,6 +1170,63 @@ moment of area of the pile section. The m-method module calculates single-pile
 and pile-group stiffness matrices, pile-head deformation, and internal-force
 distributions. A high-performance Fortran solver is used for these
 calculations.
+
+### Fortran m-Method Solver: Download and Compilation
+
+The complete source code of the m-method solver is publicly available under
+the MIT License. Users may obtain it in any of the following ways:
+
+- [Download or clone the complete PileAnalysis repository](https://github.com/CanWang-BJTU/PileAnalysis)
+  by selecting **Code → Download ZIP** on GitHub or by running:
+
+  ```bash
+  git clone https://github.com/CanWang-BJTU/PileAnalysis.git
+  ```
+
+- [View and download `PileAnalysis-m.for`](https://github.com/CanWang-BJTU/PileAnalysis/blob/main/source%20code/mmethod_framework/core/PileAnalysis-m.for),
+  the complete Fortran source file. A
+  [direct raw-source download](https://raw.githubusercontent.com/CanWang-BJTU/PileAnalysis/main/source%20code/mmethod_framework/core/PileAnalysis-m.for)
+  is also available.
+
+- [Download the precompiled Windows executable (`BCAD-PILE.exe`)](https://github.com/CanWang-BJTU/PileAnalysis/raw/refs/heads/main/source%20code/mmethod_framework/core/BCAD-PILE.exe)
+  if recompilation is not required.
+
+#### Compilation with GNU Fortran
+
+The solver is self-contained in a single legacy fixed-form Fortran source file
+and can be compiled with the freely available GNU Fortran compiler
+(`gfortran`). After installing GNU Fortran, confirm that the compiler is
+available:
+
+```bash
+gfortran --version
+```
+
+Open a terminal in `source code/mmethod_framework/core` and compile the solver
+as follows:
+
+```bash
+gfortran -O2 -std=legacy -ffixed-line-length-none PileAnalysis-m.for -o BCAD-PILE.exe
+```
+
+The options enable optimization, compatibility with legacy Fortran syntax,
+and unrestricted fixed-form line length. The resulting executable should
+remain in the same `core` directory so that the Python interface can locate
+and call it. On Linux or macOS, users may instead omit the `.exe` suffix for
+standalone command-line use; when using the existing Python interface, retain
+the expected filename `BCAD-PILE.exe`.
+
+#### Python–Fortran Communication
+
+The graphical interface writes the validated analysis parameters to a small
+input file, launches the Fortran executable, checks its execution status, and
+then parses the generated output files for visualization and export. This
+file-based interface preserves compatibility with the original computational
+framework and keeps the GUI separate from the numerical kernel. Typical input
+and output files are only tens of kilobytes, so file I/O has a limited effect
+on the overall analysis time. Invalid inputs or solver failures are reported
+to the user through informative error messages. Direct Python–Fortran coupling
+may be considered in future versions as a further optimization.
 
 ### Beam-on-Nonlinear Winkler Foundation Framework
 
